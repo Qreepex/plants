@@ -21,5 +21,10 @@
 	"about": "About",
 	"notificationsEnabled": "Notifications enabled",
 	"permissionDenied": "Permission denied or registration failed",
-	"notificationError": "Error while enabling notifications"
+	"notificationError": "Error while enabling notifications",
+	"notifications": "Notifications",
+	"notificationsDescription": "Ask for permission and register this device for push notifications.",
+	"preferences": "Preferences",
+	"enableNotifications": "Enable Notifications",
+	"requestingNotifications": "Requesting…"
 }

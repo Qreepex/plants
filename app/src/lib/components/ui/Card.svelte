@@ -2,26 +2,19 @@
 	import type { Snippet } from 'svelte';
 
 	interface Props {
-		rounded?: 'md' | 'lg' | 'xl' | '2xl';
-		shadow?: 'sm' | 'md' | 'lg';
+		/** Apply standard content padding (p-4 md:p-6) */
+		padded?: boolean;
+		class?: string;
 		children: Snippet;
 	}
 
-	const { rounded = 'lg', shadow = 'md', children }: Props = $props();
-
-	const roundedClasses = {
-		md: 'rounded-md',
-		lg: 'rounded-lg',
-		xl: 'rounded-xl',
-		'2xl': 'rounded-2xl'
-	};
-	const shadowClasses = { sm: 'shadow-sm', md: 'shadow-md', lg: 'shadow-lg' };
+	const { padded = false, class: className = '', children }: Props = $props();
 </script>
 
 <div
-	class="overflow-hidden border border-[var(--p-emerald)]/30 {roundedClasses[
-		rounded
-	]} bg-[var(--card-light)] backdrop-blur transition hover:shadow-lg {shadowClasses[shadow]}"
+	class="overflow-hidden rounded-2xl border border-ink/5 bg-surface shadow-md {padded
+		? 'p-4 md:p-6'
+		: ''} {className}"
 >
 	{@render children()}
 </div>

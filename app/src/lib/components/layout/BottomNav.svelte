@@ -6,72 +6,67 @@
 	import Can from '$lib/assets/Can.svg.svelte';
 	import SunFlower from '$lib/assets/SunFlower.svg.svelte';
 	import { tStore } from '$lib/i18n';
-	import BurgerMenu from './BurgerMenu.svelte';
+	import AppMenu from './AppMenu.svelte';
 
-	let showMenu = $state(false);
+	let menuOpen = $state(false);
 
 	function isActive(path: '/' | '/water'): boolean {
 		return page.url.pathname === resolve(path) || page.url.pathname.startsWith(resolve(path) + '/');
 	}
 
 	function navigate(path: '/' | '/water'): void {
-		showMenu = false;
+		menuOpen = false;
 		goto(resolve(path));
-	}
-
-	function toggleMenu() {
-		showMenu = !showMenu;
 	}
 </script>
 
 <!-- Bottom Navigation Bar -->
-<div class="fixed right-0 bottom-0 left-0 z-40 border-t border-emerald-200 bg-white shadow-lg">
-	<div class="pb-safe flex h-20 items-center justify-around">
-		<!-- Home -->
+<nav
+	class="fixed right-0 bottom-0 left-0 z-40 border-t border-brand/15 bg-surface/95 shadow-lg backdrop-blur"
+>
+	<div class="pb-safe flex h-20 items-stretch justify-around">
 		<button
 			onclick={() => navigate('/')}
-			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 py-2 transition-colors {!showMenu &&
+			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 py-2 transition-colors {!menuOpen &&
 			isActive('/')
-				? 'text-emerald-600'
-				: 'text-gray-600'}"
-			aria-label="Home"
+				? 'text-brand-dark'
+				: 'text-ink-soft'}"
+			aria-label={$tStore('menu.garden')}
 		>
-			<SunFlower isActive={isActive('/')} />
+			<SunFlower isActive={!menuOpen && isActive('/')} />
 			<span class="text-xs font-medium">{$tStore('menu.garden')}</span>
 		</button>
 
-		<!-- Water -->
 		<button
 			onclick={() => navigate('/water')}
-			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 py-2 transition-colors {!showMenu &&
+			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 py-2 transition-colors {!menuOpen &&
 			isActive('/water')
-				? 'text-emerald-600'
-				: 'text-gray-600'}"
-			aria-label="Water"
+				? 'text-brand-dark'
+				: 'text-ink-soft'}"
+			aria-label={$tStore('menu.water')}
 		>
-			<Can isActive={isActive('/water')} />
+			<Can isActive={!menuOpen && isActive('/water')} />
 			<span class="text-xs font-medium">{$tStore('menu.water')}</span>
 		</button>
 
-		<!-- Menu -->
 		<button
-			onclick={toggleMenu}
-			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 py-2 transition-colors {showMenu
-				? 'text-emerald-600'
-				: 'text-gray-600'}"
-			aria-label="Menu"
+			onclick={() => (menuOpen = !menuOpen)}
+			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 py-2 transition-colors {menuOpen
+				? 'text-brand-dark'
+				: 'text-ink-soft'}"
+			aria-label={$tStore('menu.menu')}
 		>
-			<Burger isActive={showMenu} />
+			<Burger isActive={menuOpen} />
 			<span class="text-xs font-medium">{$tStore('menu.menu')}</span>
 		</button>
 	</div>
-</div>
+</nav>
 
 <!-- Menu Overlay -->
-{#if showMenu}
-	<div class="pt-safe fixed inset-0 bottom-20 z-50 bg-white">
+{#if menuOpen}
+	<div class="pt-safe fixed inset-0 bottom-20 z-50 bg-canvas">
 		<div class="flex h-full flex-col overflow-hidden px-2 pt-2 md:px-10 md:pt-10 xl:px-32 xl:pt-14">
-			<BurgerMenu onClose={() => (showMenu = false)} />
+			<AppMenu onClose={() => (menuOpen = false)} />
 		</div>
 	</div>
 {/if}

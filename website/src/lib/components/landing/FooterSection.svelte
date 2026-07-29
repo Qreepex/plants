@@ -20,16 +20,16 @@
 				<ul class="mt-2 space-y-1">
 					<li>
 						<a
-							href={resolve("/#features")}
-							class="text-sm text-white/70 outline-none transition hover:text-white focus-visible:ring-0 focus-visible:text-white"
+							href={resolve('/#features')}
+							class="text-sm text-white/70 transition outline-none hover:text-white focus-visible:text-white focus-visible:ring-0"
 						>
 							{$t('nav.features')}
 						</a>
 					</li>
 					<li>
 						<a
-							href={resolve("/#download")}  
-							class="text-sm text-white/70 outline-none transition hover:text-white focus-visible:ring-0 focus-visible:text-white"
+							href={resolve('/#download')}
+							class="text-sm text-white/70 transition outline-none hover:text-white focus-visible:text-white focus-visible:ring-0"
 						>
 							{$t('nav.download')}
 						</a>
@@ -37,7 +37,7 @@
 					<li>
 						<a
 							href="mailto:support@water-me.app"
-							class="text-sm text-white/70 outline-none transition hover:text-white focus-visible:ring-0 focus-visible:text-white"
+							class="text-sm text-white/70 transition outline-none hover:text-white focus-visible:text-white focus-visible:ring-0"
 						>
 							{$t('footer.support')}
 						</a>
@@ -52,7 +52,7 @@
 						<a
 							href={resolve('/privacy')}
 							data-sveltekit-preload-data="off"
-							class="text-sm text-white/70 outline-none transition hover:text-white focus-visible:ring-0 focus-visible:text-white"
+							class="text-sm text-white/70 transition outline-none hover:text-white focus-visible:text-white focus-visible:ring-0"
 						>
 							{$t('footer.privacy')}
 						</a>
@@ -61,7 +61,7 @@
 						<a
 							href={resolve('/terms')}
 							data-sveltekit-preload-data="off"
-							class="text-sm text-white/70 outline-none transition hover:text-white focus-visible:ring-0 focus-visible:text-white"
+							class="text-sm text-white/70 transition outline-none hover:text-white focus-visible:text-white focus-visible:ring-0"
 						>
 							{$t('footer.terms')}
 						</a>
@@ -70,7 +70,7 @@
 						<a
 							href={resolve('/imprint')}
 							data-sveltekit-preload-data="off"
-							class="text-sm text-white/70 outline-none transition hover:text-white focus-visible:ring-0 focus-visible:text-white"
+							class="text-sm text-white/70 transition outline-none hover:text-white focus-visible:text-white focus-visible:ring-0"
 						>
 							{$t('footer.imprint')}
 						</a>
@@ -86,7 +86,7 @@
 							rel="external"
 							target="_blank"
 							href={TIKTOK_URL}
-							class="text-sm text-white/70 outline-none transition hover:text-white focus-visible:ring-0 focus-visible:text-white"
+							class="text-sm text-white/70 transition outline-none hover:text-white focus-visible:text-white focus-visible:ring-0"
 						>
 							{$t('footer.social.tiktok')}
 						</a>
@@ -96,7 +96,7 @@
 							rel="external"
 							target="_blank"
 							href={INSTAGRAM_URL}
-							class="text-sm text-white/70 outline-none transition hover:text-white focus-visible:ring-0 focus-visible:text-white"
+							class="text-sm text-white/70 transition outline-none hover:text-white focus-visible:text-white focus-visible:ring-0"
 						>
 							{$t('footer.social.instagram')}
 						</a>
@@ -106,7 +106,7 @@
 							rel="external"
 							target="_blank"
 							href={GITHUB_URL}
-							class="text-sm text-white/70 outline-none transition hover:text-white focus-visible:ring-0 focus-visible:text-white"
+							class="text-sm text-white/70 transition outline-none hover:text-white focus-visible:text-white focus-visible:ring-0"
 						>
 							{$t('footer.social.github')}
 						</a>

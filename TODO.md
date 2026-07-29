@@ -30,6 +30,12 @@
 - [X] Use Stats Endpoints in Website
 - [X] Legal Pages
 - [X] Legal Links funktionieren auf Webapp nicht
+- [ ] Multi Replica Notication Worker
+- [ ] Alle i18n files in einen ordner
+- [ ] Frontend für Notification Configs
+- [ ] Endpoints nur für Historie bearbeiten usw
+- [ ] Fade von Scrollable ist nicht unten wenn Scrollbar nicht komplette Höhe ist
+- [ ] LastWatered/Fertiklited checken
 
 ## Future
 

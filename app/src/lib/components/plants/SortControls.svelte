@@ -28,9 +28,10 @@
 </script>
 
 {#if iconOnly}
-	<div class="relative h-11 w-11 flex-shrink-0">
+	<div class="relative h-11 w-11 shrink-0">
 		<div
-			class="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full border-2 border-[var(--p-emerald)] bg-[var(--card-light)] text-[var(--text-light-main)] shadow-sm"
+			class="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full border-2 border-brand bg-surface text-ink shadow-sm"
+			aria-hidden="true"
 		>
 			<svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
 				<path
@@ -42,10 +43,9 @@
 			</svg>
 		</div>
 		<select
-			id="sort"
 			value={sortBy}
 			onchange={handleChange}
-			aria-label={$tStore('plants.sortBy') ?? 'Sort'}
+			aria-label={$tStore('plants.sortBy')}
 			class="absolute inset-0 h-full w-full cursor-pointer rounded-full opacity-0"
 		>
 			{#each sortOptions as option (option.value)}
@@ -54,18 +54,16 @@
 		</select>
 	</div>
 {:else}
-	<div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
-		<select
-			id="sort"
-			value={sortBy}
-			onchange={handleChange}
-			class={`rounded-full border-2 border-[var(--p-emerald)] bg-[var(--card-light)] text-base font-medium text-[var(--text-light-main)] shadow-sm transition hover:border-[var(--p-emerald-dark)] focus:border-[var(--p-emerald)] focus:outline-none ${
-				compact ? 'h-11 flex-shrink-0 px-3 text-xs' : 'w-full px-4 py-3 sm:w-auto'
-			}`}
-		>
-			{#each sortOptions as option (option.value)}
-				<option value={option.value}>{option.icon} {$tStore(option.label)}</option>
-			{/each}
-		</select>
-	</div>
+	<select
+		value={sortBy}
+		onchange={handleChange}
+		aria-label={$tStore('plants.sortBy')}
+		class="cursor-pointer rounded-full border-2 border-brand bg-surface font-medium text-ink shadow-sm transition hover:border-brand-dark focus:border-brand focus:outline-none {compact
+			? 'h-11 shrink-0 px-3 text-xs'
+			: 'w-full px-4 py-3 sm:w-auto'}"
+	>
+		{#each sortOptions as option (option.value)}
+			<option value={option.value}>{option.icon} {$tStore(option.label)}</option>
+		{/each}
+	</select>
 {/if}

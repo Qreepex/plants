@@ -57,10 +57,7 @@
 	});
 </script>
 
-<section
-	id="stats"
-	class="bg-gradient-to-r from-[#00ee57] to-[#00a343] px-4 py-20 sm:px-6 lg:px-8"
->
+<section id="stats" class="bg-gradient-to-r from-[#00ee57] to-[#00a343] px-4 py-20 sm:px-6 lg:px-8">
 	<div class="mx-auto max-w-6xl">
 		<div class="mb-12 text-center">
 			<h2 class="text-4xl font-bold text-white sm:text-5xl">{$t('stats.title')}</h2>

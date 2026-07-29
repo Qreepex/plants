@@ -3,21 +3,23 @@
 	import { tStore } from '$lib/i18n';
 	import type { Component, Snippet } from 'svelte';
 
-	type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'water';
-	type Size = 'sm' | 'md' | 'lg';
+	export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'water';
+	export type ButtonSize = 'sm' | 'md' | 'lg';
 
 	interface Props {
-		variant?: Variant;
-		size?: Size;
+		variant?: ButtonVariant;
+		size?: ButtonSize;
 		disabled?: boolean;
 		loading?: boolean;
 		onclick?: () => void;
-		loadingText?: string;
+		/** i18n key used as button label, or raw text fallback */
 		text: string;
-		class?: string;
+		/** i18n key for the label while `loading` */
+		loadingText?: string;
 		icon?: string;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		iconComponent?: Snippet | Component</* props */ any>;
+		iconComponent?: Snippet | Component<any>;
+		class?: string;
 	}
 
 	const {
@@ -26,39 +28,39 @@
 		disabled = false,
 		loading = false,
 		onclick,
-		loadingText = 'loading',
 		text,
-		class: className = '',
+		loadingText = 'common.loading',
 		icon,
-		iconComponent
+		iconComponent,
+		class: className = ''
 	}: Props = $props();
 
 	const Icon = $derived(typeof iconComponent === 'function' ? iconComponent : () => iconComponent);
 
-	const variantClasses: Record<Variant, string> = {
+	const variantClasses: Record<ButtonVariant, string> = {
 		primary:
-			'bg-[var(--p-emerald)] text-[var(--text-light-main)] hover:bg-[var(--p-emerald-dark)] font-semibold shadow-[0_4px_14px_rgba(0,238,87,0.4)]',
-		secondary: 'bg-[var(--status-success)] text-white hover:opacity-90 font-medium',
-		danger: 'bg-[var(--status-error)] text-white hover:opacity-90 font-medium',
-		ghost:
-			'bg-transparent border-2 border-[var(--p-emerald)] text-[var(--text-light-main)] hover:bg-[var(--bg-light)] font-medium',
+			'bg-brand text-ink hover:bg-brand-dark hover:text-white font-semibold shadow-[0_4px_14px_rgba(0,238,87,0.4)]',
+		secondary: 'bg-surface text-ink border border-ink/10 hover:bg-canvas font-medium',
+		danger: 'bg-danger text-white hover:opacity-90 font-medium',
+		ghost: 'bg-transparent border-2 border-brand text-brand-dark hover:bg-brand/10 font-medium',
 		water:
-			'bg-[var(--status-info)] text-white hover:opacity-90 font-semibold shadow-[0_4px_14px_rgba(33,158,188,0.4)]'
+			'bg-info text-white hover:opacity-90 font-semibold shadow-[0_4px_14px_rgba(33,158,188,0.4)]'
 	};
 
-	const sizeClasses: Record<Size, string> = {
-		sm: 'px-4 py-2 text-sm rounded-lg',
-		md: 'px-6 py-3 text-base rounded-lg',
-		lg: 'px-8 py-4 text-lg rounded-lg'
+	const sizeClasses: Record<ButtonSize, string> = {
+		sm: 'min-h-9 px-3 py-1.5 text-sm rounded-lg',
+		md: 'min-h-11 px-5 py-2.5 text-base rounded-xl',
+		lg: 'min-h-13 px-6 py-3.5 text-base rounded-xl'
 	};
 </script>
 
 <button
-	{disabled}
+	type="button"
+	disabled={disabled || loading}
 	{onclick}
-	class="cursor-pointer transition disabled:opacity-50 {variantClasses[variant]} {sizeClasses[
-		size
-	]} {className}"
+	class="inline-flex cursor-pointer items-center justify-center transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 {variantClasses[
+		variant
+	]} {sizeClasses[size]} {className}"
 >
 	{#if loading}
 		<span class="inline-flex items-center gap-2">
@@ -70,9 +72,11 @@
 			{#if iconComponent}
 				<Icon />
 			{:else if icon}
-				<span>{icon}</span>
+				<span aria-hidden="true">{icon}</span>
 			{/if}
-			<span>{$tStore(text)}</span>
+			{#if text}
+				<span>{$tStore(text)}</span>
+			{/if}
 		</span>
 	{:else}
 		{$tStore(text)}

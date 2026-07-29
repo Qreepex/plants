@@ -1,3 +1,4 @@
+import type { Tone } from '$lib/components/ui/tone';
 import type { Plant } from '$lib/types/api';
 
 export type SortOption =
@@ -18,7 +19,7 @@ export type SortOption =
  */
 export function getWateringStatus(
 	plant: Plant
-): { text: string; color: string; emoji: string; args?: string[] } | null {
+): { text: string; tone: Tone; emoji: string; args?: string[] } | null {
 	// Only show status if watering is configured
 	if (!plant.watering?.intervalDays) return null;
 
@@ -32,26 +33,26 @@ export function getWateringStatus(
 	if (daysUntilWater <= -1) {
 		return {
 			text: 'plants.waterDaysOverdue',
-			color: 'text-red-600',
+			tone: 'danger',
 			emoji: '🚨',
 			args: [String(Math.abs(daysUntilWater))]
 		};
 	}
 	if (daysUntilWater === 0) {
-		return { text: 'plants.dueTodayStatus', color: 'text-red-600', emoji: '⚠️' };
+		return { text: 'plants.dueTodayStatus', tone: 'danger', emoji: '⚠️' };
 	}
 	if (daysUntilWater === 1) {
-		return { text: 'plants.dueTomorrowStatus', color: 'text-yellow-600', emoji: '⚠️' };
+		return { text: 'plants.dueTomorrowStatus', tone: 'warn', emoji: '⚠️' };
 	}
 	if (daysUntilWater > 1) {
 		return {
 			text: 'plants.waterInDays',
-			color: 'text-green-600',
+			tone: 'ok',
 			emoji: '✅',
 			args: [String(daysUntilWater)]
 		};
 	}
-	return { text: 'plants.needsWaterStatus', color: 'text-red-600', emoji: '🌵' };
+	return { text: 'plants.needsWaterStatus', tone: 'danger', emoji: '🌵' };
 }
 
 /**
@@ -145,14 +146,14 @@ export function getPlantStatusText(plant: Plant): { key: string; args?: string[]
  */
 export function getStatusIcon(status: 'overdue' | 'due-soon' | 'ok'): {
 	emoji: string;
-	color: string;
+	tone: Tone;
 } {
 	switch (status) {
 		case 'overdue':
-			return { emoji: '🚨', color: 'text-red-600' };
+			return { emoji: '🚨', tone: 'danger' };
 		case 'due-soon':
-			return { emoji: '⚠️', color: 'text-yellow-600' };
+			return { emoji: '⚠️', tone: 'warn' };
 		default:
-			return { emoji: '✅', color: 'text-green-600' };
+			return { emoji: '✅', tone: 'ok' };
 	}
 }

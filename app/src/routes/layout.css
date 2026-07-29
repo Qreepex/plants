@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+/*
+ * Design tokens: "Emerald Oasis" (see DESIGN.md)
+ * The :root variables are the single source of truth.
+ * @theme inline aliases expose them to Tailwind utilities
+ * (e.g. bg-brand, text-ink, border-brand/30) with opacity support.
+ */
 :root {
 	/* Brand Core */
 	--p-emerald: #00ee57;
@@ -15,9 +21,30 @@
 	--bg-light: #f2faf5;
 	--card-light: #ffffff;
 	--text-light-main: #061f12;
+	--text-light-secondary: #4b6658;
 
-	/* Theme Dark */
+	/* Theme Dark (not wired up yet) */
 	--bg-dark: #08140e;
 	--card-dark: #12261d;
 	--text-dark-main: #e0f2e9;
+}
+
+@theme inline {
+	--color-brand: var(--p-emerald);
+	--color-brand-dark: var(--p-emerald-dark);
+	--color-danger: var(--status-error);
+	--color-warn: var(--status-warn);
+	--color-info: var(--status-info);
+	--color-ok: var(--status-success);
+	--color-canvas: var(--bg-light);
+	--color-surface: var(--card-light);
+	--color-ink: var(--text-light-main);
+	--color-ink-soft: var(--text-light-secondary);
+}
+
+@layer base {
+	html {
+		color: var(--color-ink);
+		background-color: var(--color-canvas);
+	}
 }

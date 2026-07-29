@@ -1,149 +1,48 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { fetchData } from '$lib/auth/fetch.svelte';
-	import { getPlantWaterStatus, getPlantStatusText, getStatusIcon } from '$lib/utils/plant';
-	import { invalidateApiCache } from '$lib/utils/cache';
-	import { sortByWateringPriority } from '$lib/utils/watering';
-	import WaterPlantCard from '$lib/components/WaterPlantCard.svelte';
-	import PageHeader from '$lib/components/layout/PageHeader.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
-	import EmptyState from '$lib/components/ui/EmptyState.svelte';
-	import Alert from '$lib/components/ui/Message.svelte';
-	import { getPlantsStore } from '$lib/stores/plants.svelte';
-	import { Haptics, NotificationType } from '@capacitor/haptics';
-	import type { Plant } from '$lib/types/api';
-	import { SvelteDate } from 'svelte/reactivity';
-	import { tStore } from '$lib/i18n';
 	import PageContent from '$lib/components/layout/PageContent.svelte';
+	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import Scrollable from '$lib/components/layout/Scrollable.svelte';
-	import List from '$lib/components/List.svelte';
+	import List from '$lib/components/layout/List.svelte';
+	import WaterPlantCard from '$lib/components/plants/WaterPlantCard.svelte';
+	import Alert from '$lib/components/ui/Alert.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import EmptyState from '$lib/components/ui/EmptyState.svelte';
+	import SectionHeader from '$lib/components/ui/SectionHeader.svelte';
+	import Spinner from '$lib/components/ui/Spinner.svelte';
+	import { getPlantsStore } from '$lib/stores/plants.svelte';
+	import { getWateringStore } from '$lib/stores/watering.svelte';
+	import type { Plant } from '$lib/types/api';
+	import { getPlantStatusText, getPlantWaterStatus, getStatusIcon } from '$lib/utils/plant';
+	import { sortByWateringPriority } from '$lib/utils/watering';
+	import { SvelteDate } from 'svelte/reactivity';
 
 	const store = getPlantsStore();
-	let selectedForWateringId = $state<string | null>(null);
-	let wateringIds = $state<string[]>([]);
+	const watering = getWateringStore();
 
-	function isWatering(id: string): boolean {
-		return wateringIds.includes(id);
-	}
+	const hasWateringConfig = (plant: Plant) => !!plant.watering?.intervalDays;
 
-	function toggleWateringSelection(id: string): void {
-		if (selectedForWateringId === id) {
-			selectedForWateringId = null;
-		} else {
-			selectedForWateringId = id;
-		}
-	}
+	const configuredPlants = $derived.by(() => {
+		const sorted = sortByWateringPriority(store.plants.filter(hasWateringConfig));
+		const priority = { overdue: 0, 'due-soon': 1, ok: 2 } as const;
+		return [...sorted].sort(
+			(a, b) => priority[getPlantWaterStatus(a)] - priority[getPlantWaterStatus(b)]
+		);
+	});
 
-	async function waterPlant(id: string): Promise<void> {
-		if (wateringIds.includes(id)) return;
-		wateringIds = [...wateringIds, id];
-		store.setError(null);
-
-		try {
-			const response = await fetchData('/api/plants/water', {
-				method: 'post',
-				body: {
-					plantIds: [id]
-				}
-			});
-
-			if (!response.ok) {
-				const errorMsg = response.error?.message || 'Failed to water plant';
-				store.setError(errorMsg);
-				try {
-					await Haptics.notification({ type: NotificationType.Error });
-				} catch {
-					console.error('Haptics notification error');
-				}
-				return;
-			}
-
-			// Clear selection and invalidate cache with confirmation
-			selectedForWateringId = null;
-			await invalidateApiCache(['/api/plants'], { waitForAck: true, timeoutMs: 500 });
-
-			// Reload plant data to ensure consistency
-			const plantsResponse = await fetchData('/api/plants', { method: 'get' });
-			if (plantsResponse.ok) {
-				store.setPlants(plantsResponse.data);
-			} else {
-				// Fallback: at least update locally
-				const now = new Date().toISOString();
-				const updated = store.plants.map((p) => {
-					if (p.id === id && p.watering) {
-						return {
-							...p,
-							watering: {
-								...p.watering,
-								lastWatered: now
-							}
-						};
-					}
-					return p;
-				});
-				store.setPlants(updated);
-			}
-
-			try {
-				await Haptics.notification({ type: NotificationType.Success });
-			} catch {
-				console.error('Haptics notification error');
-			}
-		} catch (err) {
-			const errorMsg = err instanceof Error ? err.message : 'Failed to water plant';
-			store.setError(errorMsg);
-			try {
-				await Haptics.notification({ type: NotificationType.Error });
-			} catch {
-				console.error('Haptics notification error');
-			}
-		} finally {
-			wateringIds = wateringIds.filter((pid) => pid !== id);
-		}
-	}
-
-	function hasWateringConfig(plant: Plant): boolean {
-		return !!plant.watering?.intervalDays;
-	}
-
-	function getVisiblePlants() {
-		const visible = sortByWateringPriority(store.plants.filter(hasWateringConfig));
-		// Sort by due status - due plants first, then others
-		return visible.sort((a, b) => {
-			const statusA = getPlantWaterStatus(a);
-			const statusB = getPlantWaterStatus(b);
-			const priorityMap = { overdue: 0, 'due-soon': 1, ok: 2 };
-			return priorityMap[statusA] - priorityMap[statusB];
-		});
-	}
-
-	function getDuePlants() {
-		return getVisiblePlants().filter((p) => {
-			const status = getPlantWaterStatus(p);
-			return status === 'overdue' || status === 'due-soon';
-		});
-	}
-
-	function getNotDuePlants() {
-		return getVisiblePlants().filter((p) => {
-			const status = getPlantWaterStatus(p);
-			return status === 'ok';
-		});
-	}
-
-	function getPlantsWithoutConfig() {
-		return store.plants.filter((p) => !hasWateringConfig(p));
-	}
+	const duePlants = $derived(
+		configuredPlants.filter((p) => ['overdue', 'due-soon'].includes(getPlantWaterStatus(p)))
+	);
+	const okPlants = $derived(configuredPlants.filter((p) => getPlantWaterStatus(p) === 'ok'));
+	const unconfiguredPlants = $derived(store.plants.filter((p) => !hasWateringConfig(p)));
 
 	function getNextWaterDate(plant: Plant): Date {
 		const lastWatered = plant.watering?.lastWatered
 			? new Date(plant.watering.lastWatered)
 			: new Date();
-		const intervalDays = plant.watering?.intervalDays ?? 0;
 		const nextWaterDate = new SvelteDate(lastWatered);
-		nextWaterDate.setDate(nextWaterDate.getDate() + intervalDays);
+		nextWaterDate.setDate(nextWaterDate.getDate() + (plant.watering?.intervalDays ?? 0));
 		return nextWaterDate;
 	}
 </script>
@@ -151,16 +50,15 @@
 <PageHeader icon="💧" title="menu.waterPlants" description="menu.wateringDescription" />
 
 <PageContent>
-	<!-- Error Message -->
 	{#if store.error}
-		<Alert type="error" title="common.error" description={store.error} />
+		<div class="mx-2 mb-3">
+			<Alert type="error" title="common.error" description={store.error} />
+		</div>
 	{/if}
 
-	<!-- Loading State -->
 	{#if store.loading}
-		<LoadingSpinner message="common.loadingPlants" icon="🌱" />
+		<Spinner message="common.loadingPlants" />
 	{:else if store.plants.length === 0}
-		<!-- Empty State -->
 		<EmptyState icon="🪴" title="plants.noPlants" description="plants.startAddingPlants">
 			<Button
 				variant="primary"
@@ -168,108 +66,89 @@
 				text="plants.addPlant"
 			/>
 		</EmptyState>
-	{:else if getVisiblePlants().length === 0}
-		<EmptyState icon="✓" title="plants.allWatered" description="plants.allPlantsWatered" />
+	{:else if configuredPlants.length === 0 && unconfiguredPlants.length === 0}
+		<EmptyState icon="✅" title="plants.allWatered" description="plants.allPlantsWatered" />
 	{:else}
-		<Scrollable>
-			<!-- Due Plants Section -->
-			{#if getDuePlants().length > 0}
-				<div>
-					<div class="mb-4 flex items-center gap-2">
-						<h2 class="text-xl font-bold text-[var(--text-light-main)]">
-							🌵 {$tStore('plants.needsWater')}
-						</h2>
-						<span
-							class="ml-auto rounded-full bg-[var(--status-error)] px-3 py-1 text-sm font-semibold text-white"
-						>
-							{getDuePlants().length}
-						</span>
-					</div>
-					<List noPadding>
-						{#each getDuePlants() as plant (plant.id)}
-							<WaterPlantCard
-								{plant}
-								status={getPlantWaterStatus(plant)}
-								statusTextKey={getPlantStatusText(plant)}
-								statusIcon={getStatusIcon(getPlantWaterStatus(plant))}
-								isWatering={isWatering(plant.id)}
-								isSelected={selectedForWateringId === plant.id}
-								onWater={waterPlant}
-								onSelect={toggleWateringSelection}
-								showNextWater={false}
-							/>
-						{/each}
-					</List>
-				</div>
-			{/if}
-
-			<!-- Not Due Plants Section -->
-			{#if getNotDuePlants().length > 0}
-				<div>
-					<div class="mb-4 flex items-center gap-2">
-						<h2 class="text-xl font-bold text-[var(--text-light-main)]">
-							✅ {$tStore('plants.watered')}
-						</h2>
-						<span
-							class="ml-auto rounded-full bg-[var(--status-success)] px-3 py-1 text-sm font-semibold text-white"
-						>
-							{getNotDuePlants().length}
-						</span>
-					</div>
-					<List noPadding>
-						{#each getNotDuePlants() as plant (plant.id)}
-							<WaterPlantCard
-								{plant}
-								status={getPlantWaterStatus(plant)}
-								statusTextKey={getPlantStatusText(plant)}
-								statusIcon={getStatusIcon(getPlantWaterStatus(plant))}
-								isWatering={isWatering(plant.id)}
-								isSelected={selectedForWateringId === plant.id}
-								onWater={waterPlant}
-								onSelect={toggleWateringSelection}
-								showNextWater={true}
-								nextWaterDate={getNextWaterDate(plant)}
-							/>
-						{/each}
-					</List>
-				</div>
-			{/if}
-
-			<!-- Plants Without Config Section -->
-			{#if getPlantsWithoutConfig().length > 0}
-				<div>
-					<div class="mb-4 flex items-center gap-2">
-						<h2 class="text-xl font-bold text-[var(--text-light-main)]">
-							⚙️ {$tStore('plants.noWateringConfig')}
-						</h2>
-						<span
-							class="ml-auto rounded-full bg-[var(--status-warning)] px-3 py-1 text-sm font-semibold text-white"
-						>
-							{getPlantsWithoutConfig().length}
-						</span>
-					</div>
-					<List noPadding>
-						{#each getPlantsWithoutConfig() as plant (plant.id)}
-							<div
-								class="flex items-center justify-between rounded-lg bg-[var(--bg-surface)] p-4 text-sm"
-							>
-								<div class="flex-1">
-									<p class="font-semibold text-[var(--text-main)]">{plant.name}</p>
-									<p class="text-xs text-[var(--text-light-secondary)]">
-										{plant.species}
-									</p>
-								</div>
-								<Button
-									variant="secondary"
-									text=""
-									icon="➕"
-									onclick={() => goto(resolve(`/manage/${plant.id}`))}
+		<Scrollable noPadding>
+			<div class="space-y-6 px-2">
+				{#if duePlants.length > 0}
+					<section>
+						<SectionHeader
+							icon="🌵"
+							title="plants.needsWater"
+							count={duePlants.length}
+							tone="danger"
+						/>
+						<List noPadding>
+							{#each duePlants as plant (plant.id)}
+								<WaterPlantCard
+									{plant}
+									status={getPlantWaterStatus(plant)}
+									statusTextKey={getPlantStatusText(plant)}
+									statusIcon={getStatusIcon(getPlantWaterStatus(plant)).emoji}
+									isWatering={watering.isWatering(plant.id)}
+									isSelected={watering.selectedId === plant.id}
+									onWater={(id) => watering.waterPlant(id)}
+									onSelect={(id) => watering.toggleSelection(id)}
+									showNextWater={false}
 								/>
-							</div>
-						{/each}
-					</List>
-				</div>
-			{/if}
+							{/each}
+						</List>
+					</section>
+				{/if}
+
+				{#if okPlants.length > 0}
+					<section>
+						<SectionHeader icon="✅" title="plants.watered" count={okPlants.length} tone="ok" />
+						<List noPadding>
+							{#each okPlants as plant (plant.id)}
+								<WaterPlantCard
+									{plant}
+									status={getPlantWaterStatus(plant)}
+									statusTextKey={getPlantStatusText(plant)}
+									statusIcon={getStatusIcon(getPlantWaterStatus(plant)).emoji}
+									isWatering={watering.isWatering(plant.id)}
+									isSelected={watering.selectedId === plant.id}
+									onWater={(id) => watering.waterPlant(id)}
+									onSelect={(id) => watering.toggleSelection(id)}
+									showNextWater
+									nextWaterDate={getNextWaterDate(plant)}
+								/>
+							{/each}
+						</List>
+					</section>
+				{/if}
+
+				{#if unconfiguredPlants.length > 0}
+					<section>
+						<SectionHeader
+							icon="⚙️"
+							title="plants.noWateringConfig"
+							count={unconfiguredPlants.length}
+							tone="warn"
+						/>
+						<List noPadding>
+							{#each unconfiguredPlants as plant (plant.id)}
+								<div
+									class="flex items-center justify-between gap-3 rounded-2xl bg-surface p-4 shadow"
+								>
+									<div class="min-w-0 flex-1">
+										<p class="truncate font-semibold text-ink">{plant.name}</p>
+										<p class="truncate text-xs text-ink-soft">{plant.species}</p>
+									</div>
+									<Button
+										variant="secondary"
+										size="sm"
+										text="plants.configureWateringSchedule"
+										icon="💧"
+										onclick={() => goto(resolve(`/manage/${plant.id}/edit/watering`))}
+									/>
+								</div>
+							{/each}
+						</List>
+					</section>
+				{/if}
+			</div>
 		</Scrollable>
 	{/if}
 </PageContent>

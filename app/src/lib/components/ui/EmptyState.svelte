@@ -4,6 +4,7 @@
 
 	interface Props {
 		icon: string;
+		/** i18n keys */
 		title: string;
 		description: string;
 		children?: Snippet;
@@ -12,14 +13,12 @@
 	const { icon, title, description, children }: Props = $props();
 </script>
 
-<div
-	class="rounded-2xl border-2 border-dashed border-[var(--p-emerald)] bg-[var(--bg-light)] p-12 px-2 text-center"
->
-	<div class="mb-4 text-5xl">{icon}</div>
-	<h2 class="mb-2 text-2xl font-bold text-[var(--text-light-main)]">{$tStore(title)}</h2>
-	<p class="mb-6 text-[var(--text-light-main)]/60">{$tStore(description)}</p>
+<div class="rounded-2xl border-2 border-dashed border-brand/50 bg-canvas px-4 py-12 text-center">
+	<div class="mb-4 text-5xl" aria-hidden="true">{icon}</div>
+	<h2 class="mb-2 text-xl font-bold text-ink md:text-2xl">{$tStore(title)}</h2>
+	<p class="mx-auto mb-6 max-w-md text-ink-soft">{$tStore(description)}</p>
 	{#if children}
-		<div class="mt-6">
+		<div class="mt-6 flex justify-center">
 			{@render children?.()}
 		</div>
 	{/if}

@@ -4,30 +4,20 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { fetchData } from '$lib/auth/fetch.svelte';
-	import { tStore } from '$lib/i18n';
-	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import PageContent from '$lib/components/layout/PageContent.svelte';
-	import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
-	import Alert from '$lib/components/ui/Message.svelte';
+	import PageHeader from '$lib/components/layout/PageHeader.svelte';
+	import Alert from '$lib/components/ui/Alert.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import Spinner from '$lib/components/ui/Spinner.svelte';
+	import { tStore } from '$lib/i18n';
 	import type { Plant } from '$lib/types/api';
+	import { PLANT_SECTIONS } from '$lib/utils/plantForm';
 
 	let plant = $state<Plant | null>(null);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 
-	const sectionItems = [
-		{ key: 'basic', emoji: '📋', label: 'plants.basicInformation' },
-		{ key: 'photos', emoji: '📸', label: 'plants.photos' },
-		{ key: 'location', emoji: '📍', label: 'plants.location' },
-		{ key: 'watering', emoji: '💧', label: 'plants.wateringTitle' },
-		{ key: 'fertilizing', emoji: '🍯', label: 'plants.fertilizingTitle' },
-		{ key: 'humidity', emoji: '💨', label: 'plants.humidityTitle' },
-		{ key: 'soil', emoji: '💩', label: 'plants.soilTitle' },
-		{ key: 'seasonality', emoji: '❄️', label: 'plants.seasonalityTitle' },
-		{ key: 'metadata', emoji: '🏷️', label: 'plants.metadata' }
-	] as const;
-
-	const showCreateNextStep = $derived(page.url.searchParams.get('createFlow') === '1');
+	const isCreateFlow = $derived(page.url.searchParams.get('createFlow') === '1');
 
 	onMount(async () => {
 		try {
@@ -51,7 +41,7 @@
 
 	function goToSection(section: string): void {
 		if (!plant) return;
-		const flowQuery = showCreateNextStep ? '?createFlow=1' : '';
+		const flowQuery = isCreateFlow ? '?createFlow=1' : '';
 		if (section === 'photos') {
 			goto(resolve(`/manage/${plant.id}/photos${flowQuery}`));
 			return;
@@ -64,11 +54,12 @@
 	icon="🧭"
 	title={plant?.name || $tStore('plants.editPlant')}
 	description={plant?.species || $tStore('plants.manageHubDescription')}
+	backHref={resolve(`/plant/${page.params.plant}`)}
 />
 
 <PageContent>
 	{#if loading}
-		<LoadingSpinner message="common.loadingPlantDetails" icon="🌱" />
+		<Spinner message="common.loadingPlantDetails" />
 	{:else if !plant}
 		<Alert
 			type="error"
@@ -76,24 +67,27 @@
 			description={error || $tStore('common.plantNotFound')}
 		/>
 	{:else}
-		<div class="space-y-4 px-2">
-			<p class="px-1 text-base font-semibold text-[var(--text-light-main)]">
+		<div class="px-2">
+			<p class="mb-3 px-1 text-base font-semibold text-ink">
 				{$tStore('plants.manageSections')}
 			</p>
-			<div class="overflow-hidden rounded-xl bg-white">
-				{#each sectionItems as item, index (item.key)}
+			<Card>
+				{#each PLANT_SECTIONS as item, index (item.key)}
 					<button
 						onclick={() => goToSection(item.key)}
-						class="flex min-h-14 w-full cursor-pointer items-center justify-between px-4 py-3 text-left text-base font-medium text-[var(--text-light-main)] active:bg-[var(--bg-light)]"
+						class="flex min-h-14 w-full cursor-pointer items-center justify-between px-4 py-3 text-left text-base font-medium text-ink transition hover:bg-brand/5 active:bg-brand/10"
 					>
-						<span>{item.emoji} {$tStore(item.label)}</span>
-						<span aria-hidden="true">›</span>
+						<span class="flex items-center gap-3">
+							<span aria-hidden="true">{item.emoji}</span>
+							{$tStore(item.label)}
+						</span>
+						<span class="text-ink-soft" aria-hidden="true">›</span>
 					</button>
-					{#if index < sectionItems.length - 1}
-						<div class="mx-3 h-px bg-[var(--p-emerald)]/20"></div>
+					{#if index < PLANT_SECTIONS.length - 1}
+						<div class="mx-4 h-px bg-brand/10"></div>
 					{/if}
 				{/each}
-			</div>
+			</Card>
 		</div>
 	{/if}
 </PageContent>

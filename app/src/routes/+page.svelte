@@ -1,27 +1,25 @@
 <script lang="ts">
-	import PageHeader from '$lib/components/layout/PageHeader.svelte';
-	import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
-	import EmptyState from '$lib/components/ui/EmptyState.svelte';
-	import Alert from '$lib/components/ui/Message.svelte';
-	import PlantList from '$lib/components/PlantList.svelte';
-	import { getPlantsStore } from '$lib/stores/plants.svelte';
-	import type { SortOption } from '$lib/utils/plant';
-	import PageContent from '$lib/components/layout/PageContent.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import PageContent from '$lib/components/layout/PageContent.svelte';
+	import PageHeader from '$lib/components/layout/PageHeader.svelte';
+	import PlantList from '$lib/components/plants/PlantList.svelte';
+	import Alert from '$lib/components/ui/Alert.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import EmptyState from '$lib/components/ui/EmptyState.svelte';
+	import Spinner from '$lib/components/ui/Spinner.svelte';
+	import { getPlantsStore } from '$lib/stores/plants.svelte';
+	import type { SortOption } from '$lib/utils/plant';
 
 	const store = getPlantsStore();
 	let sortBy = $state<SortOption>('nameAsc');
 </script>
 
-<!-- Header -->
 <PageHeader icon="🌱" title="common.app" description="common.appDescription" />
 
 <PageContent>
-	<!-- Loading State -->
 	{#if store.loading}
-		<LoadingSpinner message="common.loadingPlants" icon="🌿" />
+		<Spinner message="common.loadingPlants" />
 	{:else if store.error}
 		<Alert type="error" title="common.errorLoadingPlants" description={store.error} />
 	{:else if store.plants.length === 0}
@@ -33,7 +31,6 @@
 			/>
 		</EmptyState>
 	{:else}
-		<!-- Scrollable Plant List -->
 		<PlantList plants={store.plants} {sortBy} onSortChange={(value) => (sortBy = value)} />
 	{/if}
 </PageContent>

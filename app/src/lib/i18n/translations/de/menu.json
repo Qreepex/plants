@@ -21,5 +21,10 @@
 	"about": "Über",
 	"notificationsEnabled": "Benachrichtigungen aktiviert",
 	"permissionDenied": "Berechtigung verweigert oder Registrierung fehlgeschlagen",
-	"notificationError": "Fehler beim Aktivieren von Benachrichtigungen"
+	"notificationError": "Fehler beim Aktivieren von Benachrichtigungen",
+	"notifications": "Benachrichtigungen",
+	"notificationsDescription": "Berechtigung anfragen und dieses Gerät für Push-Benachrichtigungen registrieren.",
+	"preferences": "Einstellungen",
+	"enableNotifications": "Benachrichtigungen aktivieren",
+	"requestingNotifications": "Anfrage läuft…"
 }

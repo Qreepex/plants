@@ -42,6 +42,7 @@ function translate(key: string, locale: Locale, args?: string[]): string {
 		return key;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let concernTranslationValue: any = concernTranslation;
 
 	for (const part of rest) {

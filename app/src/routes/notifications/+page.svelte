@@ -1,92 +1,91 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { requestNotificationPermissions, getNotificationState } from '$lib/notifications';
-	import { tStore } from '$lib/i18n';
+	import { resolve } from '$app/paths';
 	import NotificationDebug from '$lib/components/NotificationDebug.svelte';
+	import PageContent from '$lib/components/layout/PageContent.svelte';
+	import PageHeader from '$lib/components/layout/PageHeader.svelte';
+	import Alert from '$lib/components/ui/Alert.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import Checkbox from '$lib/components/ui/form/Checkbox.svelte';
+	import { tStore } from '$lib/i18n';
+	import {
+		getNotificationState,
+		requestNotificationPermissions,
+		type NotificationState
+	} from '$lib/notifications';
 
-	let state = getNotificationState();
-	let requesting = false;
-	let message: string | null = null;
-
-	function refreshState() {
-		state = getNotificationState();
+	interface FeedbackMessage {
+		type: 'success' | 'error';
+		text: string;
 	}
 
-	async function enableNotifications() {
+	let notifState = $state<NotificationState>(getNotificationState());
+	let requesting = $state(false);
+	let message = $state<FeedbackMessage | null>(null);
+
+	// Placeholder preferences until backend config exists (see TODO.md)
+	let wateringReminders = $state(true);
+	let fertilizingReminders = $state(false);
+	let mistingReminders = $state(false);
+
+	async function enableNotifications(): Promise<void> {
 		requesting = true;
 		message = null;
 		try {
 			await requestNotificationPermissions();
-			refreshState();
-			if (state.isRegistered && state.token) {
-				message = $tStore('menu.notificationsEnabled');
-			} else {
-				message = $tStore('menu.permissionDenied');
-			}
+			notifState = getNotificationState();
+			message =
+				notifState.isRegistered && notifState.token
+					? { type: 'success' as const, text: $tStore('menu.notificationsEnabled') }
+					: { type: 'error' as const, text: $tStore('menu.permissionDenied') };
 		} catch (e) {
 			console.error(e);
-			message = $tStore('menu.notificationError');
+			message = { type: 'error' as const, text: $tStore('menu.notificationError') };
 		} finally {
 			requesting = false;
 		}
 	}
 
 	onMount(() => {
-		refreshState();
+		notifState = getNotificationState();
 	});
 </script>
 
-<div class="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-8">
-	<div class="mx-auto max-w-3xl">
-		<div class="mb-8">
-			<h1 class="text-4xl font-bold text-green-800">
-				{$tStore('menu.notifications') || 'Notifications'}
-			</h1>
-			<p class="text-green-700">Configure your notification preferences</p>
-		</div>
+<PageHeader icon="🔔" title="menu.notifications" backHref={resolve('/')} />
 
-		<div class="space-y-6">
-			<!-- Permission CTA -->
-			<div class="rounded-2xl bg-white p-6 shadow">
-				<h2 class="mb-2 text-xl font-semibold text-green-800">Enable Push Notifications</h2>
-				<p class="mb-4 text-green-700">Ask for permission and register your device.</p>
+<PageContent>
+	<div class="min-h-0 flex-1 overflow-y-auto">
+		<div class="space-y-4 px-2 pb-8">
+			<Card padded>
+				<h2 class="text-lg font-semibold text-ink">{$tStore('menu.pushNotifications')}</h2>
+				<p class="mt-1 mb-4 text-sm text-ink-soft">
+					{$tStore('menu.notificationsDescription')}
+				</p>
 				<Button
 					onclick={enableNotifications}
-					text={requesting
-						? $tStore('notifications.requesting') || 'Requesting…'
-						: $tStore('notifications.enable') || 'Enable Notifications'}
-					variant="primary"
+					loading={requesting}
 					disabled={requesting}
+					loadingText="menu.requestingNotifications"
+					text="menu.enableNotifications"
+					variant="primary"
 				/>
 				{#if message}
-					<p class="mt-3 text-sm text-green-800">{message}</p>
+					<Alert type={message.type} description={message.text} class="mt-3" />
 				{/if}
-				{#if state.token}
-					<p class="mt-3 text-xs text-gray-600">Token: {state.token}</p>
+				{#if notifState.token}
+					<p class="mt-3 text-xs break-all text-ink-soft">Token: {notifState.token}</p>
 				{/if}
-			</div>
+			</Card>
 
-			<!-- Placeholder settings -->
-			<div class="rounded-2xl bg-white p-6 shadow">
-				<h2 class="mb-2 text-xl font-semibold text-green-800">Preferences (Placeholder)</h2>
-				<div class="space-y-3 text-green-800">
-					<label class="flex items-center gap-3">
-						<input type="checkbox" />
-						<span>Watering reminders</span>
-					</label>
-					<label class="flex items-center gap-3">
-						<input type="checkbox" />
-						<span>Fertilizing reminders</span>
-					</label>
-					<label class="flex items-center gap-3">
-						<input type="checkbox" />
-						<span>Spray reminders</span>
-					</label>
-				</div>
-			</div>
+			<Card padded>
+				<h2 class="mb-2 text-lg font-semibold text-ink">{$tStore('menu.preferences')}</h2>
+				<Checkbox bind:checked={wateringReminders} label="plants.wateringTitle" />
+				<Checkbox bind:checked={fertilizingReminders} label="plants.fertilizingTitle" />
+				<Checkbox bind:checked={mistingReminders} label="plants.humidityTitle" />
+			</Card>
+
+			<NotificationDebug />
 		</div>
 	</div>
-</div>
-
-<NotificationDebug />
+</PageContent>

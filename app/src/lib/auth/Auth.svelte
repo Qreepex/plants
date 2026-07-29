@@ -1,25 +1,21 @@
 <script lang="ts">
-	import Spinner from '$lib/components/Spinner.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import Alert from '$lib/components/ui/Alert.svelte';
+	import Spinner from '$lib/components/ui/Spinner.svelte';
+	import { tStore } from '$lib/i18n';
+	import { getPlantsStore } from '$lib/stores/plants.svelte';
 	import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 	import { Capacitor } from '@capacitor/core';
 	import { initializeApp } from 'firebase/app';
 	import {
-		getAuth,
-		setPersistence,
 		browserLocalPersistence,
+		getAuth,
 		onAuthStateChanged,
-		type User
+		setPersistence
 	} from 'firebase/auth';
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 	import { FIREBASE_CONFIG } from './firebase';
-	import { tStore } from '$lib/i18n';
-	import Button from '$lib/components/ui/Button.svelte';
-	import Message from '$lib/components/ui/Message.svelte';
-	import { fetchData } from '$lib/auth/fetch.svelte';
-	import { getPlantsStore } from '$lib/stores/plants.svelte';
-	import { imageCacheStore } from '$lib/stores/imageCache.svelte';
-	import type { Plant } from '$lib/types/api';
-	import type { Snippet } from 'svelte';
 
 	interface Props {
 		children: Snippet;
@@ -29,106 +25,46 @@
 
 	const app = initializeApp(FIREBASE_CONFIG);
 	const auth = getAuth(app);
+	const store = getPlantsStore();
+	const platform = Capacitor.getPlatform();
 
-	let user = $state<User | null>(null);
+	// Web and native SDKs return different User types; we only need truthiness.
+	let user = $state<unknown>(null);
 	let loading = $state(false);
 	let initializing = $state(true);
 	let error = $state<string | null>(null);
-	let loadingImages = $state(false);
 
-	const platform = Capacitor.getPlatform();
-	const store = getPlantsStore();
-	let hasLoadedPlants = $state(false);
-
-	// Load plants data when user is authenticated
+	// Load plants data once the user is authenticated
 	$effect(() => {
-		if (user && !hasLoadedPlants) {
-			hasLoadedPlants = true;
-			loadPlants();
+		if (user && !store.hasLoaded) {
+			void store.loadPlants();
 		}
 	});
 
-	async function loadPlants(): Promise<void> {
-		store.setLoading(true);
-		loadingImages = true;
-		store.setError(null);
+	onMount(() => {
+		let unsubscribe: (() => void) | undefined;
 
-		try {
-			const result = await fetchData('/api/plants', {});
-
-			if (!result.ok) {
-				const errorMsg = result.error?.message || $tStore('plants.failedToFetchPlants');
-				store.setError(errorMsg);
-				return;
-			}
-
-			const plants = result.data || [];
-			store.setPlants(plants);
-
-			// Prefetch all plant images into cache
-			await prefetchAllImages(plants);
-		} catch (err) {
-			const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-			store.setError(errorMsg);
-		} finally {
-			store.setLoading(false);
-			loadingImages = false;
-		}
-	}
-
-	async function prefetchAllImages(plants: Plant[]): Promise<void> {
-		const prefetchPromises: Promise<void>[] = [];
-
-		for (const plant of plants) {
-			const photoIds = plant.photoIds || [];
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const photoUrls = ((plant as any)?.photoUrls as string[] | undefined) || [];
-
-			for (let i = 0; i < photoIds.length; i++) {
-				const photoId = photoIds[i];
-				const photoUrl = photoUrls[i];
-
-				if (photoId && photoUrl) {
-					// Fire and forget - load all images into persistent cache
-					prefetchPromises.push(
-						imageCacheStore
-							.getImageURL(photoId, photoUrl)
-							.then(() => {
-								// Image now in cache
-							})
-							.catch(() => {
-								// Ignore errors during prefetch
-							})
-					);
-				}
-			}
-		}
-
-		// Wait for all images to be prefetched (or fail gracefully)
-		await Promise.allSettled(prefetchPromises);
-	}
-
-	onMount(async () => {
 		if (platform === 'web') {
 			setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-			const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+			unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
 				user = firebaseUser ?? null;
 				initializing = false;
 			});
-
-			return unsubscribe;
 		} else {
-			const result = await FirebaseAuthentication.getCurrentUser();
-			user = result.user ?? null;
-			initializing = false;
+			void (async () => {
+				const result = await FirebaseAuthentication.getCurrentUser();
+				user = result.user ?? null;
+				initializing = false;
 
-			const listener = await FirebaseAuthentication.addListener('authStateChange', (res) => {
-				user = res.user;
-			});
-
-			return async () => listener.remove();
+				const listener = await FirebaseAuthentication.addListener('authStateChange', (res) => {
+					user = res.user;
+				});
+				unsubscribe = () => void listener.remove();
+			})();
 		}
+
+		return () => unsubscribe?.();
 	});
 
 	async function loginWithGoogle() {
@@ -145,12 +81,9 @@
 			}
 
 			user = result.user;
-
-			const idToken = await FirebaseAuthentication.getIdToken();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
-			console.error('Login fehlgeschlagen', err);
-			// Check if user cancelled the popup
+			console.error('Login failed', err);
 			if (
 				err?.message?.includes('popup_closed_by_user') ||
 				err?.code === 'popup-closed-by-user' ||
@@ -166,47 +99,35 @@
 	}
 </script>
 
-{#if initializing || loadingImages}
-	<Spinner />
+{#if initializing || (user && store.loading && !store.hasLoaded)}
+	<Spinner fullscreen message="common.loadingPlants" />
 {:else if user}
 	{@render children()}
 {:else}
-	<div
-		class="flex h-full items-center justify-center bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-4"
-	>
+	<div class="flex h-full items-center justify-center bg-canvas p-4">
 		<div class="w-full max-w-md">
-			<!-- Logo/Title -->
 			<div class="mb-8 text-center">
-				<h1 class="mb-2 text-5xl font-bold text-green-800">{$tStore('common.app')}</h1>
-				<p class="text-green-700">{$tStore('common.appDescription')}</p>
+				<h1 class="mb-2 text-4xl font-bold text-ink">{$tStore('common.app')}</h1>
+				<p class="text-ink-soft">{$tStore('common.appDescription')}</p>
 			</div>
 
-			<!-- Card -->
-			<div class="rounded-2xl bg-white p-8 shadow-lg">
-				<!-- Mode Indicator -->
-				<div class="mb-8">
-					<h2 class="mb-4 text-2xl font-bold text-green-800">{$tStore('auth.signIn')}</h2>
-					<p class="text-gray-600">{$tStore('auth.signInToContinue')}</p>
-				</div>
+			<Card padded class="p-8">
+				<h2 class="mb-1 text-2xl font-bold text-ink">{$tStore('auth.signIn')}</h2>
+				<p class="mb-6 text-ink-soft">{$tStore('auth.signInToContinue')}</p>
 
-				<!-- Error Message -->
 				{#if error}
-					<Message message={error} type="error" />
+					<Alert type="error" description={error} class="mb-4" />
 				{/if}
 
-				{#if loading}
-					<Message title="auth.signingIn" />
-				{/if}
-
-				<!-- Submit Button -->
 				<Button
 					disabled={loading}
 					{loading}
 					onclick={loginWithGoogle}
 					text="auth.signInWithGoogle"
 					loadingText="auth.signingIn"
+					class="w-full"
 				/>
-			</div>
+			</Card>
 		</div>
 	</div>
 {/if}
