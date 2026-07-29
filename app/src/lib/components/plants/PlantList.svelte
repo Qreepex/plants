@@ -46,7 +46,7 @@
 </div>
 
 <Scrollable multi>
-	{#each filteredPlants as plant (plant.id)}
-		<PlantCard {plant} />
+	{#each filteredPlants as plant, i (plant.id)}
+		<PlantCard {plant} index={i} />
 	{/each}
 </Scrollable>

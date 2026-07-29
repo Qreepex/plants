@@ -13,9 +13,11 @@
 
 	interface Props {
 		plant: Plant;
+		/** Stagger index for the entrance animation */
+		index?: number;
 	}
 
-	const { plant }: Props = $props();
+	const { plant, index = 0 }: Props = $props();
 
 	const photoUrl = $derived((plant as { photoUrls?: string[] }).photoUrls?.[0]);
 	const wateringStatus = $derived(getWateringStatus(plant));
@@ -76,7 +78,8 @@
 	tabindex="0"
 	onclick={openPlant}
 	onkeydown={onKeydown}
-	class="group cursor-pointer touch-manipulation overflow-hidden rounded-2xl bg-surface shadow transition-all duration-200 active:scale-[0.98] active:shadow-sm"
+	class="group pop-in cursor-pointer touch-manipulation overflow-hidden rounded-2xl bg-surface shadow transition-all duration-200 active:scale-[0.97] active:shadow-sm"
+	style:animation-delay="{Math.min(index * 30, 240)}ms"
 >
 	<!-- Image -->
 	<div class="relative h-40 overflow-hidden">

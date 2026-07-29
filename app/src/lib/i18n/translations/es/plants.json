@@ -187,6 +187,5 @@
 	"setupScheduleHint": "Configura un horario de riego y te recordaré cuando tu planta tenga sed.",
 	"careOverview": "Cuidados de un vistazo",
 	"holdToWater": "Mantén para regar",
-	"waterAllPlants": "Mantén para regar todas (%s)",
-	"hydratedAgo": "¡Todas felices!"
+	"waterAllPlants": "Mantén para regar todas (%s)"
 }

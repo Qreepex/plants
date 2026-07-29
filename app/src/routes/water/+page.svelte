@@ -68,30 +68,10 @@
 		/>
 	{:else}
 		<Scrollable noPadding>
-			<div class="space-y-6 px-2 pb-8">
+			<!-- extra bottom padding reserves space for the floating water-all bar -->
+			<div class="space-y-6 px-2 {duePlants.length > 0 ? 'pb-44' : 'pb-8'}">
 				{#if duePlants.length > 0}
-					<!-- Summary: how many are thirsty + water-all shortcut -->
-					<Card padded class="border-none bg-info/10">
-						<div class="flex items-center gap-4">
-							<MoodFace mood="thirsty" size={56} class="shrink-0 text-info" />
-							<div class="min-w-0 flex-1">
-								<p class="text-xl leading-tight font-bold text-ink">
-									{duePlants.length} × {$tStore('plants.needsWater')}
-								</p>
-							</div>
-						</div>
-						<div class="mt-3">
-							<HoldButton
-								variant="water"
-								size="lg"
-								icon="droplets"
-								label={$tStore('plants.waterAllPlants', [String(duePlants.length)])}
-								disabled={watering.isWateringAny}
-								onconfirm={() => watering.waterPlants(duePlants.map((p) => p.id))}
-							/>
-						</div>
-					</Card>
-
+					<!-- Thirsty plants first, biggest cards -->
 					<section>
 						<SectionHeader
 							icon="alert-triangle"
@@ -99,12 +79,21 @@
 							count={duePlants.length}
 							tone="danger"
 						/>
-						<List noPadding>
-							{#each duePlants as plant (plant.id)}
-								<WaterPlantCard {plant} />
+						<List noPadding class="md:grid-cols-2 2xl:grid-cols-3">
+							{#each duePlants as plant, i (plant.id)}
+								<WaterPlantCard {plant} index={i} />
 							{/each}
 						</List>
 					</section>
+				{:else if okPlants.length > 0}
+					<!-- Celebration: everything is hydrated -->
+					<Card padded class="pop-in border-none bg-brand/15 text-center">
+						<div class="flex justify-center">
+							<MoodFace mood="happy" size={72} class="animate-pulse text-ok" />
+						</div>
+						<p class="mt-3 text-xl font-bold text-ink">{$tStore('plants.allWatered')}</p>
+						<p class="mt-1 text-sm text-ink-soft">{$tStore('plants.allPlantsWatered')}</p>
+					</Card>
 				{/if}
 
 				{#if okPlants.length > 0}
@@ -115,9 +104,9 @@
 							count={okPlants.length}
 							tone="ok"
 						/>
-						<List noPadding>
-							{#each okPlants as plant (plant.id)}
-								<WaterPlantCard {plant} compact />
+						<List noPadding class="md:grid-cols-2 2xl:grid-cols-3">
+							{#each okPlants as plant, i (plant.id)}
+								<WaterPlantCard {plant} compact index={i} />
 							{/each}
 						</List>
 					</section>
@@ -134,7 +123,7 @@
 						<List noPadding>
 							{#each unconfiguredPlants as plant (plant.id)}
 								<div
-									class="flex items-center justify-between gap-3 rounded-2xl bg-surface p-4 shadow"
+									class="pop-in flex items-center justify-between gap-3 rounded-2xl bg-surface p-4 shadow"
 								>
 									<div class="min-w-0 flex-1">
 										<p class="truncate font-semibold text-ink">{plant.name}</p>
@@ -154,5 +143,23 @@
 				{/if}
 			</div>
 		</Scrollable>
+
+		<!-- Floating water-all action, always within thumb reach -->
+		{#if duePlants.length > 0}
+			<div
+				class="fixed right-3 left-3 z-50 md:right-10 md:left-10 xl:right-32 xl:left-32"
+				style="bottom: calc(env(safe-area-inset-bottom) + 5.5rem);"
+			>
+				<HoldButton
+					variant="water"
+					size="lg"
+					icon="droplets"
+					label={$tStore('plants.waterAllPlants', [String(duePlants.length)])}
+					disabled={watering.isWateringAny}
+					onconfirm={() => watering.waterPlants(duePlants.map((p) => p.id))}
+					class="shadow-xl"
+				/>
+			</div>
+		{/if}
 	{/if}
 </PageContent>

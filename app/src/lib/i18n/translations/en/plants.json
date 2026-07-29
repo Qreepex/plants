@@ -189,6 +189,5 @@
 	"setupScheduleHint": "Set up a watering schedule and I will remind you when your plant gets thirsty.",
 	"careOverview": "Care at a glance",
 	"holdToWater": "Hold to water",
-	"waterAllPlants": "Hold to water all (%s)",
-	"hydratedAgo": "All happy!"
+	"waterAllPlants": "Hold to water all (%s)"
 }

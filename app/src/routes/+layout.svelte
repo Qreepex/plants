@@ -43,7 +43,7 @@
 	<!-- Brand gradient wash behind the top of every page (DESIGN.md header gradient) -->
 	<div
 		aria-hidden="true"
-		class="pointer-events-none absolute inset-x-0 top-0 h-64"
+		class="pointer-events-none absolute inset-x-0 top-0 h-80"
 		style="background: var(--header-wash);"
 	></div>
 	<main class="pt-safe relative flex h-full flex-col overflow-hidden">

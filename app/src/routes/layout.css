@@ -29,11 +29,11 @@
 	color-scheme: light;
 
 	/* Brand gradient wash behind the top of every page */
-	--header-wash: linear-gradient(
-		135deg,
-		rgba(0, 238, 87, 0.16) 0%,
-		rgba(0, 163, 67, 0.06) 55%,
-		transparent 100%
+	--header-wash: radial-gradient(
+		120% 100% at 50% 0%,
+		rgba(0, 238, 87, 0.15) 0%,
+		rgba(0, 163, 67, 0.05) 45%,
+		transparent 72%
 	);
 }
 
@@ -46,11 +46,11 @@
 		--text-secondary: #7a9485;
 		color-scheme: dark;
 
-		--header-wash: linear-gradient(
-			135deg,
-			rgba(0, 238, 87, 0.2) 0%,
-			rgba(0, 163, 67, 0.08) 55%,
-			transparent 100%
+		--header-wash: radial-gradient(
+			120% 100% at 50% 0%,
+			rgba(0, 238, 87, 0.22) 0%,
+			rgba(0, 163, 67, 0.07) 45%,
+			transparent 72%
 		);
 	}
 }
@@ -67,6 +67,22 @@
 	--color-surface: var(--surface);
 	--color-ink: var(--text-main);
 	--color-ink-soft: var(--text-secondary);
+}
+
+/* Playful staggered entrance for cards/lists */
+@keyframes pop-in {
+	from {
+		opacity: 0;
+		transform: translateY(14px) scale(0.97);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.pop-in {
+	animation: pop-in 0.28s ease-out backwards;
 }
 
 @layer base {

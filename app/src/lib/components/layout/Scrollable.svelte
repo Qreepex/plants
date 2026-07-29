@@ -20,9 +20,9 @@
 </script>
 
 <div class="relative flex min-h-0 flex-1 flex-col">
-	<!-- Top fade (appears once scrolled) -->
+	<!-- Top fade (appears once scrolled, blends content into the page background) -->
 	<div
-		class="pointer-events-none absolute top-0 right-0 left-0 z-10 h-3 bg-gradient-to-b from-black/12 via-black/5 to-transparent transition-opacity duration-150 {isScrolled
+		class="pointer-events-none absolute top-0 right-0 left-0 z-10 h-4 bg-gradient-to-b from-canvas via-canvas/40 to-transparent transition-opacity duration-150 {isScrolled
 			? 'opacity-100'
 			: 'opacity-0'}"
 	></div>
@@ -36,9 +36,9 @@
 			{@render children()}
 		</List>
 
-		<!-- Bottom fade hinting more content -->
+		<!-- Bottom fade blending into the page background -->
 		<div
-			class="pointer-events-none sticky right-0 bottom-0 left-0 z-10 h-3 bg-gradient-to-b from-transparent via-black/5 to-black/12"
+			class="pointer-events-none sticky right-0 bottom-0 left-0 z-10 -mt-4 h-4 bg-gradient-to-b from-transparent via-canvas/40 to-canvas"
 		></div>
 	</div>
 </div>
