@@ -33,5 +33,5 @@
 	{step}
 	bind:value
 	placeholder={placeholder ? $tStore(placeholder) : undefined}
-	class="w-full rounded-xl border-2 border-brand/25 bg-surface px-4 py-2.5 text-base text-ink shadow-sm transition placeholder:text-ink/30 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
+	class="w-full rounded-xl border-2 border-brand/25 bg-canvas px-4 py-2.5 text-base text-ink shadow-sm transition placeholder:text-ink/30 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
 />

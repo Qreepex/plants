@@ -86,8 +86,8 @@
 							onclick={() => setLanguage(lang.code)}
 							class="min-h-11 flex-1 cursor-pointer rounded-xl text-sm font-medium transition {$languageStore ===
 							lang.code
-								? 'bg-brand text-ink shadow-[0_4px_14px_rgba(0,238,87,0.4)]'
-								: 'bg-brand/10 text-brand-dark hover:bg-brand/20'}"
+								? 'bg-brand text-onbrand shadow-[0_4px_14px_rgba(0,238,87,0.4)]'
+								: 'bg-brand/10 text-brand-dark hover:bg-brand/20 dark:text-brand'}"
 						>
 							{lang.label}
 						</button>

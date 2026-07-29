@@ -11,7 +11,7 @@
 <select
 	{id}
 	bind:value
-	class="w-full cursor-pointer rounded-xl border-2 border-brand/25 bg-surface px-4 py-2.5 text-base text-ink shadow-sm transition focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
+	class="w-full cursor-pointer rounded-xl border-2 border-brand/25 bg-canvas px-4 py-2.5 text-base text-ink shadow-sm transition focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
 >
 	{#each options as option (option.value)}
 		<option value={option.value}>{option.label}</option>

@@ -30,7 +30,10 @@
 			<!-- eslint-enable svelte/no-navigation-without-resolve -->
 		{/if}
 		{#if icon}
-			<span class="shrink-0 text-3xl md:text-4xl" aria-hidden="true">{icon}</span>
+			<span
+				class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface text-2xl shadow-md md:h-12 md:w-12 md:text-3xl"
+				aria-hidden="true">{icon}</span
+			>
 		{/if}
 		<div class="min-w-0">
 			<h1 class="truncate text-2xl font-bold text-ink md:text-3xl">

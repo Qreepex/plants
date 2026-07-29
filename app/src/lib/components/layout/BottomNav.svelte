@@ -6,9 +6,19 @@
 	import Can from '$lib/assets/Can.svg.svelte';
 	import SunFlower from '$lib/assets/SunFlower.svg.svelte';
 	import { tStore } from '$lib/i18n';
+	import type { Component } from 'svelte';
 	import AppMenu from './AppMenu.svelte';
 
 	let menuOpen = $state(false);
+
+	const tabs = [
+		{ path: '/', icon: SunFlower, labelKey: 'menu.garden' },
+		{ path: '/water', icon: Can, labelKey: 'menu.water' }
+	] as const satisfies readonly {
+		path: '/' | '/water';
+		icon: Component<{ isActive: boolean }>;
+		labelKey: string;
+	}[];
 
 	function isActive(path: '/' | '/water'): boolean {
 		return page.url.pathname === resolve(path) || page.url.pathname.startsWith(resolve(path) + '/');
@@ -22,42 +32,54 @@
 
 <!-- Bottom Navigation Bar -->
 <nav
-	class="fixed right-0 bottom-0 left-0 z-40 border-t border-brand/15 bg-surface/95 shadow-lg backdrop-blur"
+	class="fixed right-0 bottom-0 left-0 z-40 border-t border-ink/5 bg-surface/90 shadow-[0_-6px_24px_rgba(0,0,0,0.08)] backdrop-blur-xl select-none"
 >
 	<div class="pb-safe flex h-20 items-stretch justify-around">
-		<button
-			onclick={() => navigate('/')}
-			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 py-2 transition-colors {!menuOpen &&
-			isActive('/')
-				? 'text-brand-dark'
-				: 'text-ink-soft'}"
-			aria-label={$tStore('menu.garden')}
-		>
-			<SunFlower isActive={!menuOpen && isActive('/')} />
-			<span class="text-xs font-medium">{$tStore('menu.garden')}</span>
-		</button>
-
-		<button
-			onclick={() => navigate('/water')}
-			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 py-2 transition-colors {!menuOpen &&
-			isActive('/water')
-				? 'text-brand-dark'
-				: 'text-ink-soft'}"
-			aria-label={$tStore('menu.water')}
-		>
-			<Can isActive={!menuOpen && isActive('/water')} />
-			<span class="text-xs font-medium">{$tStore('menu.water')}</span>
-		</button>
+		{#each tabs as tab (tab.path)}
+			{@const active = !menuOpen && isActive(tab.path)}
+			<button
+				onclick={() => navigate(tab.path)}
+				class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 py-2 transition-colors"
+				aria-label={$tStore(tab.labelKey)}
+				aria-current={active ? 'page' : undefined}
+			>
+				<span
+					class="flex h-8 w-16 items-center justify-center rounded-full transition-colors duration-200 {active
+						? 'bg-brand/25'
+						: ''}"
+				>
+					<tab.icon isActive={active} />
+				</span>
+				<span
+					class="text-xs transition-colors {active
+						? 'font-semibold text-brand-dark dark:text-brand'
+						: 'font-medium text-ink-soft'}"
+				>
+					{$tStore(tab.labelKey)}
+				</span>
+			</button>
+		{/each}
 
 		<button
 			onclick={() => (menuOpen = !menuOpen)}
-			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 py-2 transition-colors {menuOpen
-				? 'text-brand-dark'
-				: 'text-ink-soft'}"
+			class="flex flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 py-2 transition-colors"
 			aria-label={$tStore('menu.menu')}
+			aria-expanded={menuOpen}
 		>
-			<Burger isActive={menuOpen} />
-			<span class="text-xs font-medium">{$tStore('menu.menu')}</span>
+			<span
+				class="flex h-8 w-16 items-center justify-center rounded-full transition-colors duration-200 {menuOpen
+					? 'bg-brand/25'
+					: ''}"
+			>
+				<Burger isActive={menuOpen} />
+			</span>
+			<span
+				class="text-xs transition-colors {menuOpen
+					? 'font-semibold text-brand-dark dark:text-brand'
+					: 'font-medium text-ink-soft'}"
+			>
+				{$tStore('menu.menu')}
+			</span>
 		</button>
 	</div>
 </nav>

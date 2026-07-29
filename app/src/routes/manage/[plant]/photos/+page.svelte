@@ -269,7 +269,7 @@
 						multiple
 						onchange={onFilesSelected}
 						aria-label={$tStore('plants.addImages')}
-						class="mt-2 w-full cursor-pointer rounded-xl border-2 border-dashed border-brand/30 bg-canvas p-3 text-sm text-ink file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink"
+						class="mt-2 w-full cursor-pointer rounded-xl border-2 border-dashed border-brand/30 bg-canvas p-3 text-sm text-ink file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-4 file:py-2 file:text-sm file:font-semibold file:text-onbrand"
 					/>
 				</label>
 			</Card>

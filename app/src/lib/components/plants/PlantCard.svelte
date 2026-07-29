@@ -90,7 +90,7 @@
 	<!-- Content -->
 	<div class="p-3.5">
 		<h3 class="line-clamp-1 text-base font-bold text-ink">{plant.name}</h3>
-		<p class="mb-2 line-clamp-1 text-xs text-ok">{plant.species}</p>
+		<p class="mb-2 line-clamp-1 text-xs text-ok dark:text-[#2fd077]">{plant.species}</p>
 
 		<!-- Watering Status -->
 		{#if wateringStatus}

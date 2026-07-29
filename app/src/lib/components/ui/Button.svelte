@@ -39,10 +39,11 @@
 
 	const variantClasses: Record<ButtonVariant, string> = {
 		primary:
-			'bg-brand text-ink hover:bg-brand-dark hover:text-white font-semibold shadow-[0_4px_14px_rgba(0,238,87,0.4)]',
+			'bg-brand text-onbrand hover:bg-brand-dark hover:text-white font-semibold shadow-[0_4px_14px_rgba(0,238,87,0.4)]',
 		secondary: 'bg-surface text-ink border border-ink/10 hover:bg-canvas font-medium',
 		danger: 'bg-danger text-white hover:opacity-90 font-medium',
-		ghost: 'bg-transparent border-2 border-brand text-brand-dark hover:bg-brand/10 font-medium',
+		ghost:
+			'bg-transparent border-2 border-brand text-brand-dark hover:bg-brand/10 dark:text-brand font-medium',
 		water:
 			'bg-info text-white hover:opacity-90 font-semibold shadow-[0_4px_14px_rgba(33,158,188,0.4)]'
 	};

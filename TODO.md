@@ -24,7 +24,7 @@
 - [X] Ansicht Pflanze öffnen mit bearbeiten Button dann
 - [X] Neue Pflanze erstellen Button im Menü und unten in der Plant List
 - [X] Water View mit Plant List
-- [ ] Dark Mode aktivierbar machen
+- [X] Dark Mode aktivierbar machen (folgt Geräteeinstellung prefers-color-scheme)
 - [ ] Gucken ob Handy online ist und nur dann bearbeiten/gießen erlauben
 - [X] Real content on website
 - [X] Use Stats Endpoints in Website
@@ -35,7 +35,7 @@
 - [ ] Frontend für Notification Configs
 - [ ] Endpoints nur für Historie bearbeiten usw
 - [ ] Fade von Scrollable ist nicht unten wenn Scrollbar nicht komplette Höhe ist
-- [ ] LastWatered/Fertiklited checken
+- [ ] LastWatered/Fertizlited checken
 
 ## Future
 

@@ -33,7 +33,7 @@
 			bind:value={draft}
 			onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), add())}
 			placeholder={$tStore(placeholder)}
-			class="flex-1 rounded-xl border-2 border-brand/25 bg-surface px-4 py-2.5 text-base text-ink shadow-sm transition placeholder:text-ink/30 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
+			class="flex-1 rounded-xl border-2 border-brand/25 bg-canvas px-4 py-2.5 text-base text-ink shadow-sm transition placeholder:text-ink/30 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
 		/>
 		<Button onclick={add} text="plants.formAdd" variant="primary" class="w-full sm:w-auto" />
 	</div>

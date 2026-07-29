@@ -14,10 +14,10 @@ export const toneBg: Record<Tone, string> = {
 };
 
 export const toneText: Record<Tone, string> = {
-	brand: 'text-brand-dark',
-	ok: 'text-ok',
-	warn: 'text-amber-700',
-	info: 'text-info',
+	brand: 'text-brand-dark dark:text-brand',
+	ok: 'text-ok dark:text-[#2fd077]',
+	warn: 'text-amber-700 dark:text-amber-300',
+	info: 'text-info dark:text-[#5bc2de]',
 	danger: 'text-danger',
 	neutral: 'text-ink-soft'
 };

@@ -111,7 +111,7 @@
 				<p class="text-ink-soft">{$tStore('common.appDescription')}</p>
 			</div>
 
-			<Card padded class="p-8">
+			<Card class="p-8">
 				<h2 class="mb-1 text-2xl font-bold text-ink">{$tStore('auth.signIn')}</h2>
 				<p class="mb-6 text-ink-soft">{$tStore('auth.signInToContinue')}</p>
 
