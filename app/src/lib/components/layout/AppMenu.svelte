@@ -7,6 +7,7 @@
 	import { languageStore, setLanguage } from '$lib/stores/language';
 	import { getPlantsStore } from '$lib/stores/plants.svelte';
 	import Card from '../ui/Card.svelte';
+	import Icon from '../ui/Icon.svelte';
 	import Button from '../ui/Button.svelte';
 	import PageContent from './PageContent.svelte';
 	import PageHeader from './PageHeader.svelte';
@@ -21,15 +22,15 @@
 	let refreshing = $state(false);
 
 	const languages = [
-		{ code: 'en', label: '🇬🇧 EN' },
-		{ code: 'de', label: '🇩🇪 DE' },
-		{ code: 'es', label: '🇪🇸 ES' }
+		{ code: 'en', label: 'EN' },
+		{ code: 'de', label: 'DE' },
+		{ code: 'es', label: 'ES' }
 	] as const;
 
 	const resources = [
-		{ icon: '🌐', label: 'menu.website', url: WEBSITE_URL },
-		{ icon: '🔒', label: 'menu.privacyPolicy', url: PRIVACY_POLICY_URL },
-		{ icon: 'ℹ️', label: 'menu.imprint', url: IMPRINT_URL }
+		{ icon: 'globe', label: 'menu.website', url: WEBSITE_URL },
+		{ icon: 'lock', label: 'menu.privacyPolicy', url: PRIVACY_POLICY_URL },
+		{ icon: 'info', label: 'menu.imprint', url: IMPRINT_URL }
 	] as const;
 
 	async function handleRefresh(): Promise<void> {
@@ -50,7 +51,7 @@
 	const version = '1.0.0';
 </script>
 
-<PageHeader icon="⚙️" title="menu.settings" />
+<PageHeader icon="settings" title="menu.settings" />
 
 <PageContent>
 	<div class="min-h-0 flex-1 overflow-y-auto">
@@ -61,7 +62,7 @@
 						onclick={handleCreate}
 						disabled={refreshing}
 						class="w-full"
-						icon="🌱"
+						icon="plus"
 						text="plants.createPlant"
 					/>
 					<Button
@@ -70,7 +71,7 @@
 						loading={refreshing}
 						variant="ghost"
 						class="w-full"
-						icon="🔄"
+						icon="refresh-cw"
 						text="common.refresh"
 					/>
 				</div>
@@ -106,7 +107,7 @@
 							class="flex min-h-11 w-full cursor-pointer items-center gap-2 px-4 py-2.5 text-left text-sm text-brand-dark transition hover:bg-brand/5 md:px-6"
 							onclick={() => openExternalLink(item.url)}
 						>
-							<span aria-hidden="true">{item.icon}</span>
+							<Icon name={item.icon} size={18} />
 							{$tStore(item.label)}
 						</button>
 					{/each}

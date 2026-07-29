@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tStore } from '$lib/i18n';
+	import Icon from './Icon.svelte';
 	import { toneBg, toneIcon, toneText, type Tone } from './tone';
 
 	type AlertType = 'error' | 'success' | 'warning' | 'info';
@@ -39,7 +40,7 @@
 	role="alert"
 	class="flex items-start gap-3 rounded-xl px-4 py-3 {toneBg[tone]} {toneText[tone]} {className}"
 >
-	<span aria-hidden="true">{toneIcon[tone]}</span>
+	<Icon name={toneIcon[tone]} size={20} class="mt-0.5 shrink-0" />
 	<div class="min-w-0 text-sm">
 		{#if translatedTitle}
 			<p class="font-bold">{translatedTitle}</p>

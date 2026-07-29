@@ -10,7 +10,6 @@
 	"skip": "Skip",
 	"save": "Save",
 	"close": "Close",
-	"madeWith": "Made with 🌿 for plant lovers",
 	"selectAll": "Select All",
 	"deselectAll": "Deselect All",
 	"clear": "Clear",
@@ -32,5 +31,6 @@
 	"unsupportedFileType": "Unsupported file type",
 	"uploadError": "Upload error",
 	"compressionFailed": "Compression failed",
-	"failed": "Failed"
+	"failed": "Failed",
+	"saved": "Saved"
 }

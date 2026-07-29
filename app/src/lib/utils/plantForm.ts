@@ -1,41 +1,27 @@
+import type { IconName } from '$lib/components/ui/icons';
 import type { Plant } from '$lib/types/api';
 import { FertilizerType, SunlightRequirement, WateringMethod, WaterType } from '$lib/types/api';
 import type { FormData } from '$lib/types/forms';
 import { createEmptyFormData } from '$lib/types/forms';
 
-export type EditSection =
-	| 'basic'
-	| 'location'
-	| 'watering'
-	| 'fertilizing'
-	| 'humidity'
-	| 'soil'
-	| 'seasonality'
-	| 'metadata';
+export interface EditorSection {
+	key: string;
+	icon: IconName;
+	titleKey: string;
+}
 
-/** Section catalogue for the manage hub and the edit page. */
-export const PLANT_SECTIONS = [
-	{ key: 'basic', emoji: '📋', label: 'plants.basicInformation' },
-	{ key: 'photos', emoji: '📸', label: 'plants.photos' },
-	{ key: 'location', emoji: '📍', label: 'plants.location' },
-	{ key: 'watering', emoji: '💧', label: 'plants.wateringTitle' },
-	{ key: 'fertilizing', emoji: '🍯', label: 'plants.fertilizingTitle' },
-	{ key: 'humidity', emoji: '💨', label: 'plants.humidityTitle' },
-	{ key: 'soil', emoji: '💩', label: 'plants.soilTitle' },
-	{ key: 'seasonality', emoji: '❄️', label: 'plants.seasonalityTitle' },
-	{ key: 'metadata', emoji: '🏷️', label: 'plants.metadata' }
-] as const;
-
-export const SECTION_TITLES: Record<EditSection, string> = {
-	basic: 'plants.basicInformation',
-	location: 'plants.location',
-	watering: 'plants.wateringTitle',
-	fertilizing: 'plants.fertilizingTitle',
-	humidity: 'plants.humidityTitle',
-	soil: 'plants.soilTitle',
-	seasonality: 'plants.seasonalityTitle',
-	metadata: 'plants.metadata'
-};
+/** Display order + identity of all editor sections (drives scroll-spy and section nav). */
+export const EDITOR_SECTIONS: EditorSection[] = [
+	{ key: 'basic', icon: 'leaf', titleKey: 'plants.basicInformation' },
+	{ key: 'photos', icon: 'camera', titleKey: 'plants.photos' },
+	{ key: 'location', icon: 'map-pin', titleKey: 'plants.location' },
+	{ key: 'watering', icon: 'droplet', titleKey: 'plants.wateringTitle' },
+	{ key: 'fertilizing', icon: 'flask-conical', titleKey: 'plants.fertilizingTitle' },
+	{ key: 'humidity', icon: 'cloud-drizzle', titleKey: 'plants.humidityTitle' },
+	{ key: 'soil', icon: 'layers', titleKey: 'plants.soilTitle' },
+	{ key: 'seasonality', icon: 'snowflake', titleKey: 'plants.seasonalityTitle' },
+	{ key: 'metadata', icon: 'tag', titleKey: 'plants.metadata' }
+];
 
 /** Create form data pre-filled from an existing plant (edit flows). */
 export function initializeFormData(plant: Plant): FormData {
@@ -71,74 +57,54 @@ export function initializeFormData(plant: Plant): FormData {
 	};
 }
 
-/** Patch payload for a single edit section (PATCH /api/plants/{id}). */
-export function buildSectionPayload(
-	section: EditSection,
-	formData: FormData
-): Record<string, unknown> {
-	switch (section) {
-		case 'basic':
-			return { name: formData.name, species: formData.species };
-		case 'location':
-			return {
-				sunlight: formData.sunlight,
-				location: {
-					room: formData.room,
-					position: formData.position,
-					isOutdoors: formData.isOutdoors
-				}
-			};
-		case 'watering':
-			return {
-				watering: {
-					intervalDays: formData.wateringIntervalDays,
-					method: formData.wateringMethod,
-					waterType: formData.waterType
-				}
-			};
-		case 'fertilizing':
-			return {
-				fertilizing: {
-					type: formData.fertilizingType,
-					intervalDays: formData.fertilizingIntervalDays,
-					npkRatio: formData.npkRatio,
-					concentrationPercent: formData.concentrationPercent,
-					activeInWinter: formData.activeInWinter
-				}
-			};
-		case 'humidity':
-			return {
-				humidity: {
-					targetHumidityPct: formData.targetHumidity,
-					requiresMisting: formData.requiresMisting,
-					mistingIntervalDays: formData.mistingIntervalDays,
-					requiresHumidifier: formData.requiresHumidifier
-				}
-			};
-		case 'soil':
-			return {
-				soil: {
-					type: formData.soilType,
-					repottingCycle: formData.repottingCycle,
-					components: formData.soilComponents
-				}
-			};
-		case 'seasonality':
-			return {
-				preferedTemperature: formData.preferedTemperature,
-				seasonality: {
-					winterRestPeriod: formData.winterRestPeriod,
-					winterWaterFactor: formData.winterWaterFactor,
-					minTempCelsius: formData.minTempCelsius
-				}
-			};
-		case 'metadata':
-			return {
-				isToxic: formData.isToxic,
-				flags: formData.flags,
-				notes: formData.notes
-			};
-	}
+/**
+ * Full PATCH payload covering every section at once (single save for the
+ * unified editor). Intentionally omits history timestamps (lastWatered etc.)
+ * so saving settings never touches care history.
+ */
+export function buildFullPayload(formData: FormData): Record<string, unknown> {
+	return {
+		name: formData.name.trim(),
+		species: formData.species.trim(),
+		sunlight: formData.sunlight,
+		isToxic: formData.isToxic,
+		preferedTemperature: formData.preferedTemperature,
+		location: {
+			room: formData.room.trim(),
+			position: formData.position.trim(),
+			isOutdoors: formData.isOutdoors
+		},
+		watering: {
+			intervalDays: formData.wateringIntervalDays,
+			method: formData.wateringMethod,
+			waterType: formData.waterType
+		},
+		fertilizing: {
+			type: formData.fertilizingType,
+			intervalDays: formData.fertilizingIntervalDays,
+			npkRatio: formData.npkRatio.trim(),
+			concentrationPercent: formData.concentrationPercent,
+			activeInWinter: formData.activeInWinter
+		},
+		humidity: {
+			targetHumidityPct: formData.targetHumidity,
+			requiresMisting: formData.requiresMisting,
+			mistingIntervalDays: formData.mistingIntervalDays,
+			requiresHumidifier: formData.requiresHumidifier
+		},
+		soil: {
+			type: formData.soilType.trim(),
+			repottingCycle: formData.repottingCycle,
+			components: formData.soilComponents
+		},
+		seasonality: {
+			winterRestPeriod: formData.winterRestPeriod,
+			winterWaterFactor: formData.winterWaterFactor,
+			minTempCelsius: formData.minTempCelsius
+		},
+		flags: formData.flags,
+		notes: formData.notes
+	};
 }
 
 function hasChanged<K extends keyof FormData>(

@@ -175,5 +175,18 @@
 	"formSafety": "Seguridad",
 	"formToxicToPetsChildren": "Tóxica para mascotas/niños",
 	"formAddNotePlaceholder": "Agregar una nota...",
-	"formNoNotesYet": "Aún no hay notas"
+	"formNoNotesYet": "Aún no hay notas",
+	"managePhotos": "Gestionar fotos",
+	"photosAfterCreateHint": "Puedes añadir fotos justo después de crear tu planta.",
+	"unsavedChangesConfirm": "Tienes cambios sin guardar. ¿Salir de todas formas?",
+	"editorDescription": "Todo sobre tu planta en un solo lugar",
+	"moodThirsty": "¡Tengo sed!",
+	"moodDueSoon": "Necesito agua pronto",
+	"moodHappy": "¡Estoy genial!",
+	"waterNow": "Regar ahora",
+	"setupScheduleHint": "Configura un horario de riego y te recordaré cuando tu planta tenga sed.",
+	"careOverview": "Cuidados de un vistazo",
+	"holdToWater": "Mantén para regar",
+	"waterAllPlants": "Mantén para regar todas (%s)",
+	"hydratedAgo": "¡Todas felices!"
 }

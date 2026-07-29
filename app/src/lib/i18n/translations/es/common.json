@@ -10,7 +10,6 @@
 	"skip": "Saltar",
 	"save": "Guardar",
 	"close": "Cerrar",
-	"madeWith": "Hecho con 🌿 para amantes de las plantas",
 	"selectAll": "Seleccionar todo",
 	"deselectAll": "Deseleccionar todo",
 	"clear": "Limpiar",
@@ -32,5 +31,6 @@
 	"unsupportedFileType": "Tipo de archivo no admitido",
 	"uploadError": "Error de carga",
 	"compressionFailed": "Fallo de compresión",
-	"failed": "Falló"
+	"failed": "Falló",
+	"saved": "Guardado"
 }

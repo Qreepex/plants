@@ -1,125 +1,100 @@
 <script lang="ts">
-	import Can from '$lib/assets/Can.svg.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
+	import HoldButton from '$lib/components/ui/HoldButton.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import MoodFace from '$lib/components/ui/MoodFace.svelte';
+	import { toneText } from '$lib/components/ui/tone';
 	import { tStore } from '$lib/i18n';
+	import { getWateringStore } from '$lib/stores/watering.svelte';
 	import type { Plant } from '$lib/types/api';
-	import { formatFutureTimestamp, formatPastTimestamp } from '$lib/utils/timestamp.svelte';
+	import {
+		getPlantStatusText,
+		getPlantWaterStatus,
+		getStatusVisual,
+		getWateringProgress
+	} from '$lib/utils/plant';
 	import PlantImage from './PlantImage.svelte';
 
 	interface Props {
 		plant: Plant;
-		status: 'overdue' | 'due-soon' | 'ok';
-		statusTextKey: { key: string; args?: string[] };
-		statusIcon: string;
-		isWatering?: boolean;
-		isSelected?: boolean;
-		showNextWater?: boolean;
-		nextWaterDate?: Date;
-		onWater: (id: string) => void;
-		onSelect: (id: string) => void;
+		/** Compact styling for already-watered plants */
+		compact?: boolean;
 	}
 
-	const {
-		plant,
-		status,
-		statusTextKey,
-		statusIcon,
-		isWatering = false,
-		isSelected = false,
-		showNextWater = false,
-		nextWaterDate,
-		onWater,
-		onSelect
-	}: Props = $props();
+	const { plant, compact = false }: Props = $props();
+	const watering = getWateringStore();
 
-	const statusBorder: Record<typeof status, string> = {
-		overdue: 'border-danger/60',
-		'due-soon': 'border-warn/60',
-		ok: 'border-ok/40'
-	};
+	const status = $derived(getPlantWaterStatus(plant));
+	const visual = $derived(getStatusVisual(status));
+	const statusText = $derived(getPlantStatusText(plant));
+	const progress = $derived(getWateringProgress(plant));
+	const photoUrls = $derived((plant as { photoUrls?: string[] }).photoUrls ?? []);
 
-	function getLastWateredText(): string {
-		const lastWatered = plant.watering?.lastWatered;
-		if (!lastWatered) return $tStore('plants.needsWaterStatus');
-		return `${$tStore('plants.lastWatered')}: ${formatPastTimestamp(new Date(lastWatered))}`;
-	}
+	const moodFace = $derived(
+		status === 'overdue' ? 'thirsty' : status === 'due-soon' ? 'soon' : 'happy'
+	);
 
-	function getNextWaterText(): string {
-		if (!nextWaterDate) return $tStore('plants.noConfig');
-		return `${$tStore('plants.nextWatering')}: ${formatFutureTimestamp(nextWaterDate)}`;
-	}
+	const statusBorder = $derived(
+		status === 'overdue'
+			? 'border-danger/50'
+			: status === 'due-soon'
+				? 'border-warn/60'
+				: 'border-ink/5'
+	);
 
-	const photoUrl = $derived((plant as { photoUrls?: string[] }).photoUrls?.[0]);
+	const barClass = $derived(
+		status === 'overdue' ? 'bg-danger' : status === 'due-soon' ? 'bg-warn' : 'bg-brand'
+	);
+
+	const isWatering = $derived(watering.isWatering(plant.id));
 </script>
 
 <div
-	class="w-full overflow-hidden rounded-2xl border-2 bg-surface shadow-md transition hover:shadow-lg {statusBorder[
-		status
-	]}"
+	class="w-full overflow-hidden rounded-2xl border-2 bg-surface shadow-md transition {statusBorder}"
 >
-	<div class="flex items-center gap-4 p-4">
+	<div class="flex items-center gap-3 p-3.5">
 		<!-- Photo -->
 		<PlantImage
 			photoId={plant.photoIds?.[0]}
-			remoteUrl={photoUrl}
+			remoteUrl={photoUrls[0]}
 			alt={plant.name}
-			class="h-16 w-16 shrink-0 rounded-lg object-cover"
-			fallback="🌿"
+			class="{compact ? 'h-14 w-14' : 'h-18 w-18'} shrink-0 rounded-xl object-cover"
 		/>
 
-		<!-- Plant Info -->
-		<div class="min-w-0 flex-1 text-left">
-			<h3 class="truncate text-lg font-bold text-ink">{plant.name}</h3>
-			<p class="mb-1.5 truncate text-sm text-ink-soft italic">{plant.species}</p>
-
-			<div class="flex items-center gap-2">
-				<span aria-hidden="true">{statusIcon}</span>
-				<span class="text-xs font-medium text-ink">
-					{$tStore(statusTextKey.key, statusTextKey.args)}
+		<!-- Info -->
+		<div class="min-w-0 flex-1">
+			<h3 class="truncate text-base font-bold text-ink">{plant.name}</h3>
+			<p class="truncate text-xs text-ink-soft italic">
+				{plant.species}{#if plant.location?.room}&nbsp;· {plant.location.room}{/if}
+			</p>
+			<div class="mt-1 flex items-center gap-1.5 {toneText[visual.tone]}">
+				<Icon name={visual.icon} size={14} />
+				<span class="text-xs font-semibold">
+					{$tStore(statusText.key, statusText.args)}
 				</span>
 			</div>
-
-			{#if status !== 'overdue' && status !== 'due-soon'}
-				<p class="mt-1 text-xs text-ink-soft">
-					{showNextWater ? getNextWaterText() : getLastWateredText()}
-				</p>
-			{/if}
-
-			{#if plant.location?.room}
-				<p class="mt-1 truncate text-xs text-ink-soft">📍 {plant.location.room}</p>
-			{/if}
 		</div>
+
+		<!-- Mood face -->
+		<MoodFace mood={moodFace} size={compact ? 40 : 48} class="{toneText[visual.tone]} shrink-0" />
 	</div>
 
-	<!-- Two-Step Action Area -->
-	<div class="px-3 pb-3">
-		{#if !isSelected}
-			<Button
-				variant="water"
-				onclick={() => onSelect(plant.id)}
-				iconComponent={Can}
-				text="plants.readyToWater"
-				class="w-full"
-			/>
-		{:else}
-			<div class="flex gap-2">
-				<Button
-					variant="danger"
-					onclick={() => onSelect(plant.id)}
-					text="plants.cancel"
-					class="flex-1"
-				/>
-				<Button
-					variant="water"
-					onclick={() => onWater(plant.id)}
-					disabled={isWatering}
-					loading={isWatering}
-					loadingText="plants.watering"
-					iconComponent={Can}
-					text="plants.confirm"
-					class="flex-1"
-				/>
-			</div>
-		{/if}
+	<!-- Thirst progress -->
+	<div class="mx-3.5 h-2 overflow-hidden rounded-full bg-ink/10" role="presentation">
+		<div
+			class="h-full rounded-full transition-all duration-500 {barClass}"
+			style:width="{progress * 100}%"
+		></div>
+	</div>
+
+	<!-- Big hold-to-water action -->
+	<div class="p-3">
+		<HoldButton
+			variant={compact ? 'secondary' : 'water'}
+			size="md"
+			icon="droplet"
+			label={isWatering ? $tStore('plants.watering') : $tStore('plants.holdToWater')}
+			disabled={isWatering}
+			onconfirm={() => watering.waterPlant(plant.id)}
+		/>
 	</div>
 </div>

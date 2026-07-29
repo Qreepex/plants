@@ -8,6 +8,7 @@
 	import PageContent from '$lib/components/layout/PageContent.svelte';
 	import PageHeader from '$lib/components/layout/PageHeader.svelte';
 	import Alert from '$lib/components/ui/Alert.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 	import Spinner from '$lib/components/ui/Spinner.svelte';
 	import { tStore } from '$lib/i18n';
@@ -35,7 +36,6 @@
 	let removedPhotoIds = $state<string[]>([]);
 
 	const existingPhotoIds = $derived(plant?.photoIds ?? []);
-	const isCreateFlow = $derived(page.url.searchParams.get('createFlow') === '1');
 	const hasPhotoChanges = $derived(uploadedPhotoKeys.length > 0 || removedPhotoIds.length > 0);
 
 	onMount(async () => {
@@ -219,7 +219,7 @@
 				timeoutMs: 100
 			});
 
-			await goto(resolve(`/manage/${plant.id}${isCreateFlow ? '?createFlow=1' : ''}`));
+			await goto(resolve(`/manage/${plant.id}/edit`));
 		} catch (err) {
 			error = err instanceof Error ? err.message : $tStore('plants.failedToSavePhotos');
 		} finally {
@@ -227,19 +227,17 @@
 		}
 	}
 
-	function skipToHub(): void {
+	function backToEditor(): void {
 		if (!plant) return;
-		goto(resolve(`/manage/${plant.id}${isCreateFlow ? '?createFlow=1' : ''}`));
+		goto(resolve(`/manage/${plant.id}/edit`));
 	}
 </script>
 
 <PageHeader
-	icon="📸"
+	icon="camera"
 	title="plants.photos"
 	description="plants.managePhotosDescription"
-	backHref={plant
-		? resolve(`/manage/${plant.id}${isCreateFlow ? '?createFlow=1' : ''}`)
-		: undefined}
+	backHref={plant ? resolve(`/manage/${plant.id}/edit`) : undefined}
 />
 
 <PageContent>
@@ -284,9 +282,15 @@
 								<div class="p-2 text-sm">
 									<div class="mb-1 truncate font-medium text-ink">{p.fileName}</div>
 									{#if p.status === 'uploaded'}
-										<span class="font-semibold text-ok">✓ {$tStore('plants.uploadUploaded')}</span>
+										<span class="inline-flex items-center gap-1.5 font-semibold text-ok">
+											<Icon name="check" size={14} />
+											{$tStore('plants.uploadUploaded')}
+										</span>
 									{:else if p.status === 'error'}
-										<span class="text-danger">✕ {p.error || $tStore('common.error')}</span>
+										<span class="inline-flex items-center gap-1.5 text-danger">
+											<Icon name="x" size={14} />
+											{p.error || $tStore('common.error')}
+										</span>
 									{:else}
 										<span class="text-ink-soft">
 											{p.status === 'pending'
@@ -329,11 +333,11 @@
 		</div>
 
 		<FormActionBar
-			onCancel={skipToHub}
+			onCancel={backToEditor}
 			onSave={saveAndContinue}
 			{saving}
 			canSave={hasPhotoChanges}
-			cancelText={isCreateFlow ? 'common.skip' : 'common.close'}
+			cancelText="common.close"
 		/>
 	{/if}
 </PageContent>

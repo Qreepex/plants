@@ -52,7 +52,7 @@
 	});
 </script>
 
-<PageHeader icon="🔔" title="menu.notifications" backHref={resolve('/')} />
+<PageHeader icon="bell" title="menu.notifications" backHref={resolve('/')} />
 
 <PageContent>
 	<div class="min-h-0 flex-1 overflow-y-auto">

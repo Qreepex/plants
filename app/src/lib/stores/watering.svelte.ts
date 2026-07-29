@@ -5,12 +5,11 @@ import { Haptics, NotificationType } from '@capacitor/haptics';
 import { getPlantsStore } from './plants.svelte';
 
 /**
- * Watering session state for the water page: tracks which plant is awaiting
- * confirmation and which plants are currently being watered (in-flight).
+ * Watering session state for the water view / plant detail:
+ * tracks which plants are currently being watered (in-flight).
  */
 export function createWateringStore() {
 	const plantsStore = getPlantsStore();
-	let selectedId = $state<string | null>(null);
 	let inFlightIds = $state<string[]>([]);
 
 	function haptic(type: NotificationType): void {
@@ -19,48 +18,49 @@ export function createWateringStore() {
 		});
 	}
 
+	async function water(ids: string[]): Promise<void> {
+		const targets = ids.filter((id) => !inFlightIds.includes(id));
+		if (targets.length === 0) return;
+		inFlightIds = [...inFlightIds, ...targets];
+		plantsStore.setError(null);
+
+		try {
+			const response = await fetchData('/api/plants/water', {
+				method: 'post',
+				body: { plantIds: targets }
+			});
+
+			if (!response.ok) {
+				plantsStore.setError(response.error?.message || t('plants.failedToWaterPlant'));
+				haptic(NotificationType.Error);
+				return;
+			}
+
+			await invalidateApiCache(['/api/plants'], { waitForAck: true, timeoutMs: 500 });
+			await plantsStore.reloadSilently();
+			haptic(NotificationType.Success);
+		} catch (err) {
+			plantsStore.setError(err instanceof Error ? err.message : t('plants.failedToWaterPlant'));
+			haptic(NotificationType.Error);
+		} finally {
+			inFlightIds = inFlightIds.filter((id) => !targets.includes(id));
+		}
+	}
+
 	return {
-		get selectedId() {
-			return selectedId;
-		},
 		get inFlightIds() {
 			return inFlightIds;
 		},
 		isWatering(id: string): boolean {
 			return inFlightIds.includes(id);
 		},
-		/** Two-step confirm: first tap selects, second tap cancels selection. */
-		toggleSelection(id: string): void {
-			selectedId = selectedId === id ? null : id;
+		get isWateringAny(): boolean {
+			return inFlightIds.length > 0;
 		},
-		async waterPlant(id: string): Promise<void> {
-			if (inFlightIds.includes(id)) return;
-			inFlightIds = [...inFlightIds, id];
-			plantsStore.setError(null);
-
-			try {
-				const response = await fetchData('/api/plants/water', {
-					method: 'post',
-					body: { plantIds: [id] }
-				});
-
-				if (!response.ok) {
-					plantsStore.setError(response.error?.message || t('plants.failedToWaterPlant'));
-					haptic(NotificationType.Error);
-					return;
-				}
-
-				selectedId = null;
-				await invalidateApiCache(['/api/plants'], { waitForAck: true, timeoutMs: 500 });
-				await plantsStore.reloadSilently();
-				haptic(NotificationType.Success);
-			} catch (err) {
-				plantsStore.setError(err instanceof Error ? err.message : t('plants.failedToWaterPlant'));
-				haptic(NotificationType.Error);
-			} finally {
-				inFlightIds = inFlightIds.filter((pid) => pid !== id);
-			}
-		}
+		/** Water a single plant. */
+		waterPlant: (id: string) => water([id]),
+		/** Water multiple plants at once (e.g. "water all due"). */
+		waterPlants: (ids: string[]) => water(ids)
 	};
 }
 

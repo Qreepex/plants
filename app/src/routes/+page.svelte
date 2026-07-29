@@ -15,7 +15,7 @@
 	let sortBy = $state<SortOption>('nameAsc');
 </script>
 
-<PageHeader icon="🌱" title="common.app" description="common.appDescription" />
+<PageHeader icon="sprout" title="common.app" description="common.appDescription" />
 
 <PageContent>
 	{#if store.loading}
@@ -23,7 +23,7 @@
 	{:else if store.error}
 		<Alert type="error" title="common.errorLoadingPlants" description={store.error} />
 	{:else if store.plants.length === 0}
-		<EmptyState icon="🪴" title="plants.noPlants" description="plants.startAddingPlants">
+		<EmptyState icon="leaf" title="plants.noPlants" description="plants.startAddingPlants">
 			<Button
 				variant="primary"
 				onclick={() => goto(resolve('/manage/new'))}

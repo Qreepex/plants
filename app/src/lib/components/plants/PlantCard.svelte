@@ -6,7 +6,9 @@
 	import { getWateringStatus } from '$lib/utils/plant';
 	import { formatPastTimestamp } from '$lib/utils/timestamp.svelte';
 	import Chip from '../ui/Chip.svelte';
+	import Icon from '../ui/Icon.svelte';
 	import { toneBg, toneText } from '../ui/tone';
+	import type { IconName } from '../ui/icons';
 	import PlantImage from './PlantImage.svelte';
 
 	interface Props {
@@ -19,7 +21,7 @@
 	const wateringStatus = $derived(getWateringStatus(plant));
 
 	interface MetaTile {
-		icon: string;
+		icon: IconName;
 		text: string;
 		tone: keyof typeof toneBg;
 	}
@@ -28,28 +30,28 @@
 		const tiles: MetaTile[] = [];
 		if (plant.watering?.intervalDays) {
 			tiles.push({
-				icon: '💧',
+				icon: 'droplet',
 				text: `${$tStore('plants.every')} ${plant.watering.intervalDays} ${$tStore('plants.days')}`,
 				tone: 'info'
 			});
 		}
 		if (plant.fertilizing?.intervalDays) {
 			tiles.push({
-				icon: '🥗',
+				icon: 'flask-conical',
 				text: `${$tStore('plants.every')} ${plant.fertilizing.intervalDays} ${$tStore('plants.days')}`,
 				tone: 'warn'
 			});
 		}
 		if (plant.sunlight) {
 			tiles.push({
-				icon: '☀️',
+				icon: 'sun',
 				text: $tStore('plants.sunlight.' + plant.sunlight),
 				tone: 'brand'
 			});
 		}
 		if (plant.humidity?.targetHumidityPct) {
 			tiles.push({
-				icon: '💨',
+				icon: 'cloud-drizzle',
 				text: `${plant.humidity.targetHumidityPct}%`,
 				tone: 'info'
 			});
@@ -83,7 +85,6 @@
 			remoteUrl={photoUrl}
 			alt={plant.name}
 			class="h-full w-full object-cover transition-transform duration-300 group-active:scale-105"
-			fallback="🌱"
 		/>
 	</div>
 
@@ -100,7 +101,7 @@
 						wateringStatus.tone
 					]}"
 				>
-					<span aria-hidden="true">{wateringStatus.emoji}</span>
+					<Icon name={wateringStatus.icon} size={14} />
 					<span>{$tStore(wateringStatus.text, wateringStatus.args)}</span>
 				</div>
 				{#if plant.watering?.lastWatered}
@@ -118,7 +119,7 @@
 			<div class="grid grid-cols-2 gap-2">
 				{#each metaTiles as tile (tile.icon + tile.text)}
 					<div class="rounded-lg p-1.5 text-xs {toneBg[tile.tone]}">
-						<span aria-hidden="true">{tile.icon}</span>
+						<Icon name={tile.icon} size={13} />
 						<span class="ml-1 text-ink/80">{tile.text}</span>
 					</div>
 				{/each}
@@ -128,7 +129,9 @@
 		<!-- Misting Info -->
 		{#if plant.humidity?.requiresMisting && plant.humidity?.mistingIntervalDays}
 			<div class="mt-2 rounded-lg bg-info/15 p-2 text-xs text-ink/80">
-				💦 {$tStore('plants.sprayEvery')}
+				<span class="inline-flex items-center gap-1"
+					><Icon name="cloud-drizzle" size={13} /> {$tStore('plants.sprayEvery')}</span
+				>
 				<span class="font-semibold text-info">{plant.humidity.mistingIntervalDays}</span>
 				{$tStore('plants.days')}
 				{#if plant.humidity.lastMisted}
@@ -144,7 +147,7 @@
 		{#if plant.flags && plant.flags.length > 0}
 			<div class="mt-2 flex flex-wrap gap-1.5">
 				{#each plant.flags as flag (flag)}
-					<Chip tone="warn" icon="⚡" text={flag} />
+					<Chip tone="warn" icon="zap" text={flag} />
 				{/each}
 			</div>
 		{/if}
@@ -152,7 +155,11 @@
 		<!-- Notes Preview -->
 		{#if plant.notes && plant.notes.length > 0}
 			<div class="mt-2 border-t border-brand/15 pt-2">
-				<p class="line-clamp-2 text-xs text-ink-soft">📝 {plant.notes[0]}</p>
+				<p class="line-clamp-2 text-xs text-ink-soft">
+					<span class="inline-flex items-center gap-1.5"
+						><Icon name="file-text" size={13} /> {plant.notes[0]}</span
+					>
+				</p>
 			</div>
 		{/if}
 	</div>

@@ -14,7 +14,7 @@
 	"noPlants": "No plants yet!",
 	"startAddingPlants": "Start adding your plants to track their care.",
 	"needsWater": "Needs water!",
-	"waterSoon": "⚠️ Water soon",
+	"waterSoon": "Water soon",
 	"watered": "Watered",
 	"every": "Every",
 	"days": "days",
@@ -177,5 +177,18 @@
 	"formSafety": "Safety",
 	"formToxicToPetsChildren": "Toxic to pets/children",
 	"formAddNotePlaceholder": "Add a note...",
-	"formNoNotesYet": "No notes yet"
+	"formNoNotesYet": "No notes yet",
+	"managePhotos": "Manage photos",
+	"photosAfterCreateHint": "You can add photos right after creating your plant.",
+	"unsavedChangesConfirm": "You have unsaved changes. Leave anyway?",
+	"editorDescription": "Everything about your plant in one place",
+	"moodThirsty": "I am thirsty!",
+	"moodDueSoon": "Water me soon",
+	"moodHappy": "I am feeling great!",
+	"waterNow": "Water now",
+	"setupScheduleHint": "Set up a watering schedule and I will remind you when your plant gets thirsty.",
+	"careOverview": "Care at a glance",
+	"holdToWater": "Hold to water",
+	"waterAllPlants": "Hold to water all (%s)",
+	"hydratedAgo": "All happy!"
 }

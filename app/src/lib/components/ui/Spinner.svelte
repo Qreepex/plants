@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { tStore } from '$lib/i18n';
+	import Icon from './Icon.svelte';
 
 	interface Props {
 		/** Full-screen branded loading screen (auth bootstrap, app start) */
 		fullscreen?: boolean;
 		/** i18n key for the loading message */
 		message?: string;
-		icon?: string;
 	}
 
-	const { fullscreen = false, message = 'common.loading', icon = '🌿' }: Props = $props();
+	const { fullscreen = false, message = 'common.loading' }: Props = $props();
 </script>
 
 {#if fullscreen}
@@ -80,7 +80,12 @@
 {:else}
 	<div class="flex min-h-64 items-center justify-center" role="status">
 		<div class="text-center">
-			<div class="mb-3 animate-bounce text-4xl" aria-hidden="true">{icon}</div>
+			<div
+				class="mb-3 inline-block animate-bounce text-brand-dark dark:text-brand"
+				aria-hidden="true"
+			>
+				<Icon name="sprout" size={40} />
+			</div>
 			<p class="text-base text-ink-soft">{$tStore(message)}</p>
 		</div>
 	</div>

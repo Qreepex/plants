@@ -2,6 +2,8 @@
 	import ButtonSpinner from '$lib/assets/ButtonSpinner.svelte';
 	import { tStore } from '$lib/i18n';
 	import type { Component, Snippet } from 'svelte';
+	import Icon from './Icon.svelte';
+	import type { IconName } from './icons';
 
 	export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'water';
 	export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -16,7 +18,7 @@
 		text: string;
 		/** i18n key for the label while `loading` */
 		loadingText?: string;
-		icon?: string;
+		icon?: IconName;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		iconComponent?: Snippet | Component<any>;
 		class?: string;
@@ -35,7 +37,9 @@
 		class: className = ''
 	}: Props = $props();
 
-	const Icon = $derived(typeof iconComponent === 'function' ? iconComponent : () => iconComponent);
+	const IconComponent = $derived(
+		typeof iconComponent === 'function' ? iconComponent : () => iconComponent
+	);
 
 	const variantClasses: Record<ButtonVariant, string> = {
 		primary:
@@ -50,8 +54,8 @@
 
 	const sizeClasses: Record<ButtonSize, string> = {
 		sm: 'min-h-9 px-3 py-1.5 text-sm rounded-lg',
-		md: 'min-h-11 px-5 py-2.5 text-base rounded-xl',
-		lg: 'min-h-13 px-6 py-3.5 text-base rounded-xl'
+		md: 'min-h-12 px-5 py-2.5 text-base rounded-xl',
+		lg: 'min-h-14 px-6 py-3.5 text-base rounded-2xl'
 	};
 </script>
 
@@ -59,7 +63,7 @@
 	type="button"
 	disabled={disabled || loading}
 	{onclick}
-	class="inline-flex cursor-pointer items-center justify-center transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 {variantClasses[
+	class="inline-flex cursor-pointer items-center justify-center transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 {variantClasses[
 		variant
 	]} {sizeClasses[size]} {className}"
 >
@@ -71,9 +75,9 @@
 	{:else if icon || iconComponent}
 		<span class="inline-flex items-center gap-2">
 			{#if iconComponent}
-				<Icon />
+				<IconComponent />
 			{:else if icon}
-				<span aria-hidden="true">{icon}</span>
+				<Icon name={icon} size={size === 'sm' ? 16 : 18} />
 			{/if}
 			{#if text}
 				<span>{$tStore(text)}</span>

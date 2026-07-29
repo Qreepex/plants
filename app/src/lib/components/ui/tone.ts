@@ -1,7 +1,9 @@
 /**
- * Shared tone system for status-colored UI primitives (Chip, StatTile, Alert, ...).
+ * Shared tone system for status-colored UI primitives (Chip, Alert, SectionHeader, ...).
  * Maps semantic tones to the Emerald Oasis design tokens.
  */
+import type { IconName } from './icons';
+
 export type Tone = 'brand' | 'ok' | 'warn' | 'info' | 'danger' | 'neutral';
 
 export const toneBg: Record<Tone, string> = {
@@ -22,11 +24,11 @@ export const toneText: Record<Tone, string> = {
 	neutral: 'text-ink-soft'
 };
 
-export const toneIcon: Record<Tone, string> = {
-	brand: '🌿',
-	ok: '✅',
-	warn: '⚠️',
-	info: 'ℹ️',
-	danger: '⛔',
-	neutral: '•'
+export const toneIcon: Record<Tone, IconName> = {
+	brand: 'leaf',
+	ok: 'check-circle',
+	warn: 'alert-triangle',
+	info: 'info',
+	danger: 'alert-circle',
+	neutral: 'info'
 };

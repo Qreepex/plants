@@ -175,5 +175,18 @@
 	"formSafety": "Sicherheit",
 	"formToxicToPetsChildren": "Giftig für Haustiere/Kinder",
 	"formAddNotePlaceholder": "Notiz hinzufügen...",
-	"formNoNotesYet": "Noch keine Notizen"
+	"formNoNotesYet": "Noch keine Notizen",
+	"managePhotos": "Fotos verwalten",
+	"photosAfterCreateHint": "Fotos kannst du direkt nach dem Erstellen hinzufügen.",
+	"unsavedChangesConfirm": "Du hast ungespeicherte Änderungen. Wirklich verlassen?",
+	"editorDescription": "Alles rund um deine Pflanze an einem Ort",
+	"moodThirsty": "Ich bin durstig!",
+	"moodDueSoon": "Ich brauche bald Wasser",
+	"moodHappy": "Mir geht es super!",
+	"waterNow": "Jetzt gießen",
+	"setupScheduleHint": "Lege einen Gießplan fest und ich erinnere dich, wenn deine Pflanze Durst hat.",
+	"careOverview": "Pflege im Überblick",
+	"holdToWater": "Halten zum Gießen",
+	"waterAllPlants": "Halten, um alle zu gießen (%s)",
+	"hydratedAgo": "Alle glücklich!"
 }

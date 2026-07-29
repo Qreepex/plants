@@ -11,13 +11,13 @@
 
 	let { sortBy = 'nameAsc', onSortChange, compact = false, iconOnly = false }: Props = $props();
 
-	const sortOptions: { value: SortOption; label: string; icon: string }[] = [
-		{ value: 'nameAsc', label: 'plants.sortOptions.nameAsc', icon: '🔤' },
-		{ value: 'nameDesc', label: 'plants.sortOptions.nameDesc', icon: '🔤' },
-		{ value: 'lastWateredAsc', label: 'plants.sortOptions.lastWateredAsc', icon: '💧' },
-		{ value: 'lastWateredDesc', label: 'plants.sortOptions.lastWateredDesc', icon: '💧' },
-		{ value: 'speciesAsc', label: 'plants.sortOptions.speciesAsc', icon: '🌿' },
-		{ value: 'speciesDesc', label: 'plants.sortOptions.speciesDesc', icon: '🌿' }
+	const sortOptions: { value: SortOption; label: string }[] = [
+		{ value: 'nameAsc', label: 'plants.sortOptions.nameAsc' },
+		{ value: 'nameDesc', label: 'plants.sortOptions.nameDesc' },
+		{ value: 'lastWateredAsc', label: 'plants.sortOptions.lastWateredAsc' },
+		{ value: 'lastWateredDesc', label: 'plants.sortOptions.lastWateredDesc' },
+		{ value: 'speciesAsc', label: 'plants.sortOptions.speciesAsc' },
+		{ value: 'speciesDesc', label: 'plants.sortOptions.speciesDesc' }
 	];
 
 	function handleChange(e: Event) {
@@ -49,7 +49,7 @@
 			class="absolute inset-0 h-full w-full cursor-pointer rounded-full opacity-0"
 		>
 			{#each sortOptions as option (option.value)}
-				<option value={option.value}>{option.icon} {$tStore(option.label)}</option>
+				<option value={option.value}>{$tStore(option.label)}</option>
 			{/each}
 		</select>
 	</div>
@@ -63,7 +63,7 @@
 			: 'w-full px-4 py-3 sm:w-auto'}"
 	>
 		{#each sortOptions as option (option.value)}
-			<option value={option.value}>{option.icon} {$tStore(option.label)}</option>
+			<option value={option.value}>{$tStore(option.label)}</option>
 		{/each}
 	</select>
 {/if}

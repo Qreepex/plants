@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { imageCacheStore } from '$lib/stores/imageCache.svelte';
+	import Icon from '../ui/Icon.svelte';
+	import type { IconName } from '../ui/icons';
 
 	interface Props {
 		photoId?: string;
 		remoteUrl?: string;
 		alt: string;
-		/** Emoji shown when no image is available */
-		fallback?: string;
-		/** Classes applied to the <img> or fallback wrapper (sizing lives with the parent) */
+		/** Icon shown when no image is available */
+		fallback?: IconName;
+		/** Classes applied to the <img> or the fallback tile (sizing lives with the parent) */
 		class?: string;
 		fallbackClass?: string;
 	}
@@ -16,7 +18,7 @@
 		photoId,
 		remoteUrl,
 		alt,
-		fallback = '🌿',
+		fallback = 'leaf',
 		class: className = '',
 		fallbackClass = ''
 	}: Props = $props();
@@ -52,9 +54,9 @@
 	<img src={url} {alt} class={className} />
 {:else}
 	<div
-		class="flex items-center justify-center bg-gradient-to-br from-brand to-brand-dark {className} {fallbackClass}"
+		class="flex items-center justify-center bg-gradient-to-br from-brand to-brand-dark text-onbrand/90 {className} {fallbackClass}"
 		aria-hidden="true"
 	>
-		<span class="text-5xl">{fallback}</span>
+		<Icon name={fallback} size={36} />
 	</div>
 {/if}

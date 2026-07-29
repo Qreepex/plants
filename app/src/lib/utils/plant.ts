@@ -1,3 +1,4 @@
+import type { IconName } from '$lib/components/ui/icons';
 import type { Tone } from '$lib/components/ui/tone';
 import type { Plant } from '$lib/types/api';
 
@@ -19,7 +20,7 @@ export type SortOption =
  */
 export function getWateringStatus(
 	plant: Plant
-): { text: string; tone: Tone; emoji: string; args?: string[] } | null {
+): { text: string; tone: Tone; icon: IconName; args?: string[] } | null {
 	// Only show status if watering is configured
 	if (!plant.watering?.intervalDays) return null;
 
@@ -34,25 +35,25 @@ export function getWateringStatus(
 		return {
 			text: 'plants.waterDaysOverdue',
 			tone: 'danger',
-			emoji: '🚨',
+			icon: 'alert-triangle',
 			args: [String(Math.abs(daysUntilWater))]
 		};
 	}
 	if (daysUntilWater === 0) {
-		return { text: 'plants.dueTodayStatus', tone: 'danger', emoji: '⚠️' };
+		return { text: 'plants.dueTodayStatus', tone: 'danger', icon: 'droplet' };
 	}
 	if (daysUntilWater === 1) {
-		return { text: 'plants.dueTomorrowStatus', tone: 'warn', emoji: '⚠️' };
+		return { text: 'plants.dueTomorrowStatus', tone: 'warn', icon: 'droplet' };
 	}
 	if (daysUntilWater > 1) {
 		return {
 			text: 'plants.waterInDays',
 			tone: 'ok',
-			emoji: '✅',
+			icon: 'check-circle',
 			args: [String(daysUntilWater)]
 		};
 	}
-	return { text: 'plants.needsWaterStatus', tone: 'danger', emoji: '🌵' };
+	return { text: 'plants.needsWaterStatus', tone: 'danger', icon: 'alert-triangle' };
 }
 
 /**
@@ -120,6 +121,16 @@ export function getDaysUntilWater(plant: Plant): number {
 }
 
 /**
+ * Thirst level as 0..1 progress (0 = just watered, 1 = overdue), for progress bars.
+ */
+export function getWateringProgress(plant: Plant): number {
+	const interval = plant.watering?.intervalDays ?? 0;
+	if (!interval) return 0;
+	const daysSince = Math.max(0, interval - getDaysUntilWater(plant));
+	return Math.min(1, daysSince / interval);
+}
+
+/**
  * Get watering status for water page
  */
 export function getPlantWaterStatus(plant: Plant): 'overdue' | 'due-soon' | 'ok' {
@@ -144,16 +155,16 @@ export function getPlantStatusText(plant: Plant): { key: string; args?: string[]
 /**
  * Get status icon for water page
  */
-export function getStatusIcon(status: 'overdue' | 'due-soon' | 'ok'): {
-	emoji: string;
+export function getStatusVisual(status: 'overdue' | 'due-soon' | 'ok'): {
+	icon: IconName;
 	tone: Tone;
 } {
 	switch (status) {
 		case 'overdue':
-			return { emoji: '🚨', tone: 'danger' };
+			return { icon: 'alert-triangle', tone: 'danger' };
 		case 'due-soon':
-			return { emoji: '⚠️', tone: 'warn' };
+			return { icon: 'alert-circle', tone: 'warn' };
 		default:
-			return { emoji: '✅', tone: 'ok' };
+			return { icon: 'check-circle', tone: 'ok' };
 	}
 }
