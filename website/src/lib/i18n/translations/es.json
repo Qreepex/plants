@@ -16,7 +16,15 @@
 		"subtitle": "Nunca olvides regar tus plantas de nuevo. Obtén recordatorios inteligentes y rastrea el crecimiento de tu planta.",
 		"cta_primary": "Descargar ahora",
 		"cta_secondary": "Probar Web App",
-		"trust_badge": "Confiado por amantes de las plantas en todo el mundo"
+		"trust_badge": "Confiado por amantes de las plantas en todo el mundo",
+		"mock_plant_name": "Monstera Deliciosa",
+		"mock_plant_spot": "Salón · Ventana",
+		"mock_happy": "¡Estoy genial!",
+		"mock_next": "Próximo riego",
+		"mock_in_days": "en 4 días",
+		"mock_hold": "Mantén para regar",
+		"mock_watered": "Regada",
+		"mock_reminders": "Recordatorios inteligentes"
 	},
 	"features": {
 		"section_title": "Características",

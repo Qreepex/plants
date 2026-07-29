@@ -1,20 +1,22 @@
 <script lang="ts">
 	import { API_BASE_URL } from '$lib';
-	import { t } from '$lib/i18n.svelte';
 	import { onMount } from 'svelte';
+	import Icon from '../ui/Icon.svelte';
+	import type { IconName } from '../ui/icons';
+	import { t } from '$lib/i18n.svelte';
 
-	let displayStats = $state({
-		users: 0,
-		plants: 0,
-		reminders: 0
-	});
-	let targetStats = $state({
-		users: 0,
-		plants: 0,
-		reminders: 0
-	});
-	let hasAnimated = $state(false);
+	let displayStats = $state({ users: 0, plants: 0, reminders: 0 });
+	let targetStats = $state({ users: 0, plants: 0, reminders: 0 });
+	let hasAnimated = false;
 	let statsReady = $state(false);
+
+	const statCards = $derived.by(
+		(): { icon: IconName; value: number; suffix: string; labelKey: string }[] => [
+			{ icon: 'sprout', value: displayStats.users, suffix: '', labelKey: 'stats.users' },
+			{ icon: 'leaf', value: displayStats.plants, suffix: '', labelKey: 'stats.plants' },
+			{ icon: 'bell', value: displayStats.reminders, suffix: '+', labelKey: 'stats.reminders' }
+		]
+	);
 
 	onMount(async () => {
 		try {
@@ -37,49 +39,48 @@
 		if (!statsReady || hasAnimated) return;
 		hasAnimated = true;
 
-		const duration = 2000;
-		const startTime = Date.now();
+		const duration = 1600;
+		const startTime = performance.now();
 
 		const animate = () => {
-			const elapsed = Date.now() - startTime;
-			const progress = Math.min(elapsed / duration, 1);
+			const progress = Math.min((performance.now() - startTime) / duration, 1);
+			const eased = 1 - Math.pow(1 - progress, 3);
 
-			displayStats.users = Math.floor(targetStats.users * progress);
-			displayStats.plants = Math.floor(targetStats.plants * progress);
-			displayStats.reminders = Math.floor(targetStats.reminders * progress);
+			displayStats = {
+				users: Math.floor(targetStats.users * eased),
+				plants: Math.floor(targetStats.plants * eased),
+				reminders: Math.floor(targetStats.reminders * eased)
+			};
 
-			if (progress < 1) {
-				requestAnimationFrame(animate);
-			}
+			if (progress < 1) requestAnimationFrame(animate);
 		};
 
-		animate();
+		requestAnimationFrame(animate);
 	});
 </script>
 
-<section id="stats" class="bg-gradient-to-r from-[#00ee57] to-[#00a343] px-4 py-20 sm:px-6 lg:px-8">
+<section id="stats" class="bg-gradient-to-br from-brand to-brand-dark px-4 py-20 sm:px-6 lg:px-8">
 	<div class="mx-auto max-w-6xl">
 		<div class="mb-12 text-center">
-			<h2 class="text-4xl font-bold text-white sm:text-5xl">{$t('stats.title')}</h2>
+			<h2 class="text-4xl font-bold text-onbrand sm:text-5xl">{$t('stats.title')}</h2>
 		</div>
 
-		<div class="grid gap-8 sm:grid-cols-3">
-			<div class="rounded-2xl bg-white/20 p-8 backdrop-blur-sm">
-				<div class="text-5xl font-bold text-white">{displayStats.users.toLocaleString()}</div>
-				<p class="mt-2 text-lg text-white/90">{$t('stats.users')}</p>
-			</div>
-
-			<div class="rounded-2xl bg-white/20 p-8 backdrop-blur-sm">
-				<div class="text-5xl font-bold text-white">{displayStats.plants.toLocaleString()}</div>
-				<p class="mt-2 text-lg text-white/90">{$t('stats.plants')}</p>
-			</div>
-
-			<div class="rounded-2xl bg-white/20 p-8 backdrop-blur-sm">
-				<div class="text-5xl font-bold text-white">
-					{displayStats.reminders.toLocaleString()}+
+		<div class="grid gap-6 sm:grid-cols-3">
+			{#each statCards as card (card.labelKey)}
+				<div
+					class="rounded-3xl border border-white/25 bg-white/10 p-8 text-center backdrop-blur-sm transition hover:bg-white/15"
+				>
+					<div
+						class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white"
+					>
+						<Icon name={card.icon} size={24} />
+					</div>
+					<div class="text-5xl font-bold text-white tabular-nums">
+						{card.value.toLocaleString()}{card.suffix}
+					</div>
+					<p class="mt-2 text-lg text-white/90">{$t(card.labelKey)}</p>
 				</div>
-				<p class="mt-2 text-lg text-white/90">{$t('stats.reminders')}</p>
-			</div>
+			{/each}
 		</div>
 	</div>
 </section>

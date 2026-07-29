@@ -16,7 +16,15 @@
 		"subtitle": "Vergiss nie wieder, deine Pflanzen zu gießen. Erhalte intelligente Erinnerungen und verfolge das Wachstum deiner Pflanze.",
 		"cta_primary": "Jetzt herunterladen",
 		"cta_secondary": "Web-App testen",
-		"trust_badge": "Vertraut von Pflanzenliebhabern weltweit"
+		"trust_badge": "Vertraut von Pflanzenliebhabern weltweit",
+		"mock_plant_name": "Monstera Deliciosa",
+		"mock_plant_spot": "Wohnzimmer · Fenster",
+		"mock_happy": "Mir geht es super!",
+		"mock_next": "Nächste Bewässerung",
+		"mock_in_days": "in 4 Tagen",
+		"mock_hold": "Halten zum Gießen",
+		"mock_watered": "Gegossen",
+		"mock_reminders": "Smarte Erinnerungen"
 	},
 	"features": {
 		"section_title": "Funktionen",

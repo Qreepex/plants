@@ -9,7 +9,7 @@
 	import FooterSection from './FooterSection.svelte';
 </script>
 
-<main class="min-h-screen bg-gradient-to-br from-[#f2faf5] via-white to-[#e8f9f0]">
+<main class="min-h-screen bg-canvas">
 	<LandingNav />
 	<HeroSection />
 	<FeaturesSection />

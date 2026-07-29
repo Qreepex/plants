@@ -16,7 +16,15 @@
 		"subtitle": "Never forget to water your plants again. Get smart reminders and track your plant's growth.",
 		"cta_primary": "Download Now",
 		"cta_secondary": "Try Web App",
-		"trust_badge": "Trusted by plant lovers worldwide"
+		"trust_badge": "Trusted by plant lovers worldwide",
+		"mock_plant_name": "Monstera Deliciosa",
+		"mock_plant_spot": "Living Room · Window",
+		"mock_happy": "I am feeling great!",
+		"mock_next": "Next watering",
+		"mock_in_days": "in 4 days",
+		"mock_hold": "Hold to water",
+		"mock_watered": "Watered",
+		"mock_reminders": "Smart reminders"
 	},
 	"features": {
 		"section_title": "Features",

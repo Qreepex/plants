@@ -1,23 +1,106 @@
 @import 'tailwindcss';
 
+/*
+ * Design tokens: "Emerald Oasis" (shared with the app, see DESIGN.md)
+ * Light = default, dark follows the device setting (prefers-color-scheme).
+ * Always use semantic utilities (canvas/surface/ink/ink-soft) instead of
+ * hardcoded colors so dark mode keeps working.
+ */
 :root {
-	/* Brand Core */
+	/* Brand core — shared across schemes */
 	--p-emerald: #00ee57;
 	--p-emerald-dark: #00a343;
+	--on-emerald: #061f12; /* dark text on bright brand green (see DESIGN.md) */
 
-	/* Status */
+	/* Status — work on both schemes */
 	--status-error: #e63946;
 	--status-warn: #ffb703;
 	--status-info: #219ebc;
 	--status-success: #008f41;
 
-	/* Theme Light */
-	--bg-light: #f2faf5;
-	--card-light: #ffffff;
-	--text-light-main: #061f12;
+	/* Light scheme (default) */
+	--bg: #f2faf5;
+	--surface: #ffffff;
+	--text-main: #061f12;
+	--text-secondary: #4b6658;
+	color-scheme: light;
 
-	/* Theme Dark */
-	--bg-dark: #08140e;
-	--card-dark: #12261d;
-	--text-dark-main: #e0f2e9;
+	/* Soft brand glow for hero/section headers */
+	--glow: radial-gradient(
+		60% 55% at 50% 0%,
+		rgba(0, 238, 87, 0.14) 0%,
+		rgba(0, 163, 67, 0.05) 50%,
+		transparent 100%
+	);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		/* Dark scheme */
+		--bg: #08140e;
+		--surface: #12261d;
+		--text-main: #e0f2e9;
+		--text-secondary: #7a9485;
+		color-scheme: dark;
+
+		--glow: radial-gradient(
+			60% 55% at 50% 0%,
+			rgba(0, 238, 87, 0.18) 0%,
+			rgba(0, 163, 67, 0.06) 50%,
+			transparent 100%
+		);
+	}
+}
+
+@theme inline {
+	--color-brand: var(--p-emerald);
+	--color-brand-dark: var(--p-emerald-dark);
+	--color-onbrand: var(--on-emerald);
+	--color-danger: var(--status-error);
+	--color-warn: var(--status-warn);
+	--color-info: var(--status-info);
+	--color-ok: var(--status-success);
+	--color-canvas: var(--bg);
+	--color-surface: var(--surface);
+	--color-ink: var(--text-main);
+	--color-ink-soft: var(--text-secondary);
+}
+
+/* Playful pop-in entrance */
+@keyframes pop-in {
+	from {
+		opacity: 0;
+		transform: translateY(14px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.pop-in {
+	animation: pop-in 0.35s ease-out backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pop-in {
+		animation: none;
+	}
+}
+
+@layer base {
+	html {
+		color: var(--color-ink);
+		background-color: var(--color-canvas);
+		scroll-behavior: smooth;
+	}
+
+	body {
+		-webkit-tap-highlight-color: transparent;
+		-webkit-text-size-adjust: 100%;
+	}
+
+	::selection {
+		background-color: rgb(0 238 87 / 0.3);
+	}
 }

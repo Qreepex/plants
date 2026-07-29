@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
+	import Icon from '$lib/components/ui/Icon.svelte';
 
 	onMount(() => {
 		// Detect user's preferred language
@@ -17,7 +18,7 @@
 		}
 
 		// Redirect to language-specific page
-		goto(resolve(`/${userLang}`), { replaceState: true });
+		goto(resolve(`/${userLang as 'en' | 'de' | 'es'}`), { replaceState: true });
 	});
 </script>
 
@@ -26,11 +27,13 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<div
-	class="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f2faf5] via-white to-[#e8f9f0]"
->
+<div class="flex min-h-screen items-center justify-center bg-canvas">
 	<div class="text-center">
-		<div class="mb-4 text-6xl">🌿</div>
-		<h1 class="text-2xl font-bold text-[#061f12]">Redirecting...</h1>
+		<div
+			class="mx-auto mb-4 flex h-16 w-16 animate-bounce items-center justify-center rounded-3xl bg-brand text-onbrand shadow-[0_4px_20px_rgba(0,238,87,0.4)]"
+		>
+			<Icon name="sprout" size={34} />
+		</div>
+		<h1 class="text-2xl font-bold text-ink">Redirecting...</h1>
 	</div>
 </div>
